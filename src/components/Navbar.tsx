@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { AppView } from '../types';
-import { BookOpen, Terminal, Clock, Lock, Share2, Check, Radio } from 'lucide-react';
+import { BookOpen, Terminal, Clock, Lock, Share2, Check, Radio, Lightbulb } from 'lucide-react';
 
 interface NavbarProps {
   currentView: AppView;
   onViewChange: (view: AppView) => void;
   activeTestCount: number;
+  onOpenLabBriefing?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ currentView, onViewChange, activeTestCount }) => {
+export const Navbar: React.FC<NavbarProps> = ({ currentView, onViewChange, activeTestCount, onOpenLabBriefing }) => {
   const [copied, setCopied] = useState(false);
   const [isSessionOpen, setIsSessionOpen] = useState(true);
 
@@ -131,8 +132,21 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onViewChange, activ
             })}
           </nav>
 
-          {/* Zone 3: Quick Action (Share Student Test Link) */}
+          {/* Zone 3: Quick Action (Lab Tips + Share Student Test Link) */}
           <div className="flex items-center space-x-2">
+            {onOpenLabBriefing && (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.94 }}
+                onClick={onOpenLabBriefing}
+                title="Open Coding Lab Entry Briefing & Python Tips"
+                className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 liquid-glass-pill hover:bg-white/[0.08] text-slate-200 text-xs font-semibold rounded-xl transition shadow-sm border border-white/10 min-h-[36px]"
+              >
+                <Lightbulb className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span className="hidden sm:inline">Lab Tips</span>
+              </motion.button>
+            )}
+
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.94 }}

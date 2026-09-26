@@ -116,6 +116,7 @@ export default function App() {
         currentView={currentView}
         onViewChange={(view) => setCurrentView(view)}
         activeTestCount={activeTestCount}
+        onOpenLabBriefing={() => setIsLoading(true)}
       />
 
       {/* 4. Main Content Area with OS26 View Transitions */}
@@ -133,6 +134,7 @@ export default function App() {
               <StudyMaterials
                 onOpenInLab={handleOpenInLab}
                 onStartTest={() => setCurrentView('test')}
+                onOpenLabBriefing={() => setIsLoading(true)}
               />
             )}
 

@@ -26,9 +26,10 @@ import {
 interface StudyMaterialsProps {
   onOpenInLab: (code: string) => void;
   onStartTest: () => void;
+  onOpenLabBriefing?: () => void;
 }
 
-export const StudyMaterials: React.FC<StudyMaterialsProps> = ({ onOpenInLab, onStartTest }) => {
+export const StudyMaterials: React.FC<StudyMaterialsProps> = ({ onOpenInLab, onStartTest, onOpenLabBriefing }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [activeSectionId, setActiveSectionId] = useState<string>(CURRICULUM_MODULES[0].sectionId);
@@ -186,6 +187,15 @@ export const StudyMaterials: React.FC<StudyMaterialsProps> = ({ onOpenInLab, onS
               <Terminal className="w-4 h-4" />
               <span>Open Python Lab</span>
             </button>
+            {onOpenLabBriefing && (
+              <button
+                onClick={onOpenLabBriefing}
+                className="flex items-center justify-center space-x-2 px-5 py-3 rounded-xl liquid-glass-pill hover:bg-white/[0.08] text-blue-300 font-semibold text-xs sm:text-sm transition min-h-[44px]"
+              >
+                <Lightbulb className="w-4 h-4 text-amber-400" />
+                <span>Lab Entry Tips</span>
+              </button>
+            )}
           </div>
         </div>
 
