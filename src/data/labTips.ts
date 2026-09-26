@@ -272,7 +272,7 @@ export const LAB_BOOT_LOGS = [
   { progress: 0, text: 'Calibrating LetLearn_Py OS26 sandbox core...', icon: 'cpu' },
   { progress: 18, text: 'Mounting Python 3.12 dynamic list memory pointers...', icon: 'terminal' },
   { progress: 38, text: 'Loading curriculum modules, methods & lab playground...', icon: 'book' },
-  { progress: 58, text: 'Syncing 1-Hour timed exam engine & PIN handshake...', icon: 'lock' },
+  { progress: 58, text: 'Syncing timed assessment engine & PIN handshake...', icon: 'lock' },
   { progress: 78, text: 'Connecting live telemetry with instructor mentor desk...', icon: 'radio' },
   { progress: 92, text: 'Verifying syntax engine & code test runner...', icon: 'check' },
   { progress: 100, text: 'LetLearn_Py Lab Ready. Access granted.', icon: 'sparkles' },

@@ -984,7 +984,10 @@ apiRouter.post('/reset', (req: Request, res: Response) => {
     return res.status(403).json({ error: 'Unauthorized' });
   }
   testSessions.clear();
-  res.json({ success: true, message: 'All test sessions have been reset.' });
+  mentorTests.clear();
+  flaggedQuestions.clear();
+  sessionState.activeTestId = null;
+  res.json({ success: true, message: 'All test sessions, mentor tests, and flags have been reset.' });
 });
 
 // 18. Export Results as CSV

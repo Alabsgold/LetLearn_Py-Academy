@@ -45,7 +45,7 @@ export const ProgressRing: React.FC<ProgressRingProps> = ({
       return {
         label: '100% Assessment Ready',
         color: 'text-emerald-400 bg-emerald-500/15 border-emerald-500/30',
-        note: 'Exceptional work! You have reviewed all 12 modules. Ready for the 1-hour test.'
+        note: "Exceptional work! You have reviewed all 12 modules. Ready for today's test."
       };
     }
     if (percentage >= 70) {

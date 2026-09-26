@@ -141,7 +141,7 @@ export const StudentAuthModal: React.FC<StudentAuthModalProps> = ({
               <span>Firebase Cloud Sync</span>
             </div>
             <p className="text-[11px] text-slate-300">
-              Your completed modules, 1-hour assessment attempts, and daily streaks are permanently saved to our cohort database.
+              Your completed modules, assessment attempts, and daily streaks are permanently saved to our cohort database.
             </p>
           </div>
 

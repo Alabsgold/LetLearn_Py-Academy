@@ -118,6 +118,37 @@ export function subscribeToAllTests(callback: (tests: MentorTest[]) => void) {
   }
 }
 
+// Helper to format duration into human-readable format e.g. 1h, 45m, 1h 30m
+export function formatDurationLabel(minutes?: number): string {
+  if (!minutes || minutes <= 0) return '';
+  if (minutes === 60) return '1h';
+  if (minutes < 60) return `${minutes}m`;
+  const hrs = Math.floor(minutes / 60);
+  const rem = minutes % 60;
+  return rem > 0 ? `${hrs}h ${rem}m` : `${hrs}h`;
+}
+
+// Helper to get formatted button label and state for Today's Test
+export function getTestButtonLabel(test: MentorTest | null | undefined): {
+  title: string;
+  hasTest: boolean;
+  durationLabel: string;
+} {
+  if (!test) {
+    return {
+      title: 'No Test Today',
+      hasTest: false,
+      durationLabel: ''
+    };
+  }
+  const dur = formatDurationLabel(test.durationMinutes);
+  return {
+    title: dur ? `Take Today's Test (${dur})` : "Take Today's Test",
+    hasTest: true,
+    durationLabel: dur
+  };
+}
+
 // 2. Subscribe to the currently active / live test (with auto-activation)
 export function subscribeToActiveTest(callback: (test: MentorTest | null) => void) {
   try {
@@ -127,6 +158,13 @@ export function subscribeToActiveTest(callback: (test: MentorTest | null) => voi
       (snapshot) => {
         let activeTest: MentorTest | null = null;
         const now = Date.now();
+
+        if (snapshot.empty) {
+          // Database was purged or empty: clear local tests cache
+          saveLocalTests([]);
+          callback(null);
+          return;
+        }
 
         snapshot.forEach((docSnap) => {
           const t = docSnap.data() as MentorTest;
@@ -143,8 +181,8 @@ export function subscribeToActiveTest(callback: (test: MentorTest | null) => voi
           }
         });
 
-        // If no test is marked live, check local preference or upcoming scheduled test
-        if (!activeTest) {
+        // If no test is marked live, check local preference only if offline/fromCache
+        if (!activeTest && snapshot.metadata.fromCache) {
           const localTests = getLocalTests();
           for (const lt of localTests) {
             if (lt.isLive) {

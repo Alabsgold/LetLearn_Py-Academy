@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CURRICULUM_MODULES } from '../data/curriculumData';
-import { StudyModule } from '../types';
+import { StudyModule, MentorTest } from '../types';
 import { runPythonCode } from '../utils/pythonRunner';
 import {
   Search,
@@ -20,18 +20,36 @@ import {
   ListOrdered,
   ArrowRight,
   Lightbulb,
-  TableProperties
+  TableProperties,
+  Clock,
+  Calendar
 } from 'lucide-react';
 import { ProgressRing } from './ProgressRing';
 import { getStoredStudent, syncStudentModules } from '../services/studentService';
+import { formatDurationLabel, subscribeToActiveTest } from '../services/testService';
 
 interface StudyMaterialsProps {
   onOpenInLab: (code: string) => void;
   onStartTest: () => void;
   onOpenLabBriefing?: () => void;
+  activeTest?: MentorTest | null;
 }
 
-export const StudyMaterials: React.FC<StudyMaterialsProps> = ({ onOpenInLab, onStartTest, onOpenLabBriefing }) => {
+export const StudyMaterials: React.FC<StudyMaterialsProps> = ({ onOpenInLab, onStartTest, onOpenLabBriefing, activeTest: propActiveTest }) => {
+  const [internalActiveTest, setInternalActiveTest] = useState<MentorTest | null>(propActiveTest || null);
+
+  useEffect(() => {
+    if (propActiveTest !== undefined) {
+      setInternalActiveTest(propActiveTest);
+      return;
+    }
+    const unsub = subscribeToActiveTest((test) => {
+      setInternalActiveTest(test);
+    });
+    return () => unsub();
+  }, [propActiveTest]);
+
+  const currentActiveTest = propActiveTest !== undefined ? propActiveTest : internalActiveTest;
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [activeSectionId, setActiveSectionId] = useState<string>(CURRICULUM_MODULES[0].sectionId);
@@ -204,13 +222,26 @@ export const StudyMaterials: React.FC<StudyMaterialsProps> = ({ onOpenInLab, onS
           </div>
 
           <div className="flex flex-col sm:flex-row lg:flex-col gap-2.5 sm:gap-3 shrink-0">
-            <button
-              onClick={onStartTest}
-              className="flex items-center justify-center space-x-2 px-5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm shadow-xl shadow-blue-500/25 transition active:scale-95 min-h-[44px]"
-            >
-              <BookOpen className="w-4 h-4" />
-              <span>Take Today's Test (1h)</span>
-            </button>
+            {currentActiveTest ? (
+              <button
+                onClick={onStartTest}
+                className="flex items-center justify-center space-x-2 px-5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm shadow-xl shadow-blue-500/25 transition active:scale-95 min-h-[44px]"
+              >
+                <BookOpen className="w-4 h-4" />
+                <span>
+                  Take Today's Test {formatDurationLabel(currentActiveTest.durationMinutes) ? `(${formatDurationLabel(currentActiveTest.durationMinutes)})` : ''}
+                </span>
+              </button>
+            ) : (
+              <button
+                onClick={onStartTest}
+                title="No test currently active for today. Click to check test status or lobby."
+                className="flex items-center justify-center space-x-2 px-5 py-3 rounded-xl liquid-glass-pill hover:bg-white/[0.08] text-slate-300 font-semibold text-xs sm:text-sm transition min-h-[44px] border border-white/10"
+              >
+                <Calendar className="w-4 h-4 text-slate-400" />
+                <span>No Test Today</span>
+              </button>
+            )}
             <button
               onClick={() => onOpenInLab('# Write and practice any Python code\nmyList = [1, "string", 9.10]\nprint("Initial list:", myList)')}
               className="flex items-center justify-center space-x-2 px-5 py-3 rounded-xl liquid-glass-pill hover:bg-white/[0.08] text-amber-300 font-semibold text-xs sm:text-sm transition min-h-[44px]"

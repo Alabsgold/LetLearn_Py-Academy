@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { StudentProfile } from '../types';
+import { StudentProfile, MentorTest } from '../types';
 import { CURRICULUM_MODULES } from '../data/curriculumData';
 import { 
   Flame, 
@@ -15,9 +15,11 @@ import {
   Award, 
   ArrowRight,
   TrendingUp,
-  RotateCcw
+  RotateCcw,
+  Calendar
 } from 'lucide-react';
 import { clearStoredStudent, syncStudentModules } from '../services/studentService';
+import { formatDurationLabel, subscribeToActiveTest } from '../services/testService';
 
 interface StudentDashboardProps {
   student: StudentProfile | null;
@@ -27,6 +29,7 @@ interface StudentDashboardProps {
   onGoToLab: () => void;
   onStudentUpdated: (student: StudentProfile) => void;
   onLogout?: () => void;
+  activeTest?: MentorTest | null;
 }
 
 export const StudentDashboard: React.FC<StudentDashboardProps> = ({
@@ -36,8 +39,23 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   onGoToTest,
   onGoToLab,
   onStudentUpdated,
-  onLogout
+  onLogout,
+  activeTest: propActiveTest
 }) => {
+  const [internalActiveTest, setInternalActiveTest] = useState<MentorTest | null>(propActiveTest || null);
+
+  useEffect(() => {
+    if (propActiveTest !== undefined) {
+      setInternalActiveTest(propActiveTest);
+      return;
+    }
+    const unsub = subscribeToActiveTest((test) => {
+      setInternalActiveTest(test);
+    });
+    return () => unsub();
+  }, [propActiveTest]);
+
+  const activeTest = propActiveTest !== undefined ? propActiveTest : internalActiveTest;
   const [completedSet, setCompletedSet] = useState<Set<string>>(() => {
     return new Set(student?.completedModules || []);
   });
@@ -187,7 +205,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             {student.totalTestsTaken || 0}
           </div>
           <p className="text-[10px] text-slate-400 font-mono">
-            1-Hour Assessed Tests
+            Assessed Tests
           </p>
         </div>
 
@@ -262,25 +280,47 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-white transition" />
         </button>
 
-        <button
-          onClick={onGoToTest}
-          className="flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-blue-600/80 to-indigo-600/80 hover:from-blue-600 hover:to-indigo-600 transition text-left border border-white/20 group text-white shadow-xl shadow-blue-500/20"
-        >
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white">
-              <Clock className="w-5 h-5" />
+        {activeTest ? (
+          <button
+            onClick={onGoToTest}
+            className="flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-blue-600/80 to-indigo-600/80 hover:from-blue-600 hover:to-indigo-600 transition text-left border border-white/20 group text-white shadow-xl shadow-blue-500/20"
+          >
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white">
+                <Clock className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-white">
+                  Take Today's Test {formatDurationLabel(activeTest.durationMinutes) ? `(${formatDurationLabel(activeTest.durationMinutes)})` : ''}
+                </h3>
+                <p className="text-xs text-blue-100">
+                  {activeTest.questionsCount || activeTest.questions?.length || 20} questions • {activeTest.title || 'Real-time grading'}
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-white">
-                Take Today's Test (1h)
-              </h3>
-              <p className="text-xs text-blue-100">
-                18 questions • Real-time grading
-              </p>
+            <ArrowRight className="w-4 h-4 text-white" />
+          </button>
+        ) : (
+          <button
+            onClick={onGoToTest}
+            className="flex items-center justify-between p-4 rounded-2xl liquid-glass hover:bg-white/[0.08] transition text-left border border-white/10 group text-slate-300"
+          >
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400">
+                <Calendar className="w-5 h-5 text-slate-400" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-white group-hover:text-slate-200 transition">
+                  No Test Today
+                </h3>
+                <p className="text-xs text-slate-400">
+                  No assessment set for today • Check back soon
+                </p>
+              </div>
             </div>
-          </div>
-          <ArrowRight className="w-4 h-4 text-white" />
-        </button>
+            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-white transition" />
+          </button>
+        )}
       </div>
 
       {/* 4. Curriculum Modules Checklist (Real-Time Synchronized to Firebase) */}

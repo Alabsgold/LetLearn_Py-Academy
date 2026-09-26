@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { AppView, StudentProfile } from './types';
+import { AppView, StudentProfile, MentorTest } from './types';
 import { Navbar } from './components/Navbar';
 import { StudyMaterials } from './components/StudyMaterials';
 import { PracticeLab } from './components/PracticeLab';
@@ -12,6 +12,7 @@ import { WelcomeGateModal } from './components/WelcomeGateModal';
 import { LabTipsModal } from './components/LabTipsModal';
 import { OS26Loader } from './components/OS26Loader';
 import { getStoredStudent, clearStoredStudent } from './services/studentService';
+import { subscribeToActiveTest } from './services/testService';
 
 export default function App() {
   // 1. Initial Loader: Only runs ONCE per session to eliminate reloading delays across tabs
@@ -26,6 +27,7 @@ export default function App() {
   const [labCode, setLabCode] = useState<string | undefined>(undefined);
   const [activeTestCount, setActiveTestCount] = useState<number>(0);
   const [isSessionOpen, setIsSessionOpen] = useState<boolean>(true);
+  const [activeTest, setActiveTest] = useState<MentorTest | null>(null);
 
   // 3. Student auth state loaded from persistent local storage & synced to Firebase
   const [student, setStudent] = useState<StudentProfile | null>(() => getStoredStudent());
@@ -100,6 +102,14 @@ export default function App() {
     checkLiveSession();
     const interval = setInterval(checkLiveSession, 8000);
     return () => clearInterval(interval);
+  }, []);
+
+  // Real-time listener for active test from Firestore
+  useEffect(() => {
+    const unsub = subscribeToActiveTest((test) => {
+      setActiveTest(test);
+    });
+    return () => unsub();
   }, []);
 
   const handleOpenInLab = (code: string) => {
@@ -201,6 +211,7 @@ export default function App() {
         onViewChange={(view) => setCurrentView(view)}
         activeTestCount={activeTestCount}
         isSessionOpen={isSessionOpen}
+        activeTest={activeTest}
         student={student}
         deviceRole={deviceRole}
         onOpenStudentAuth={() => setIsAuthModalOpen(true)}
@@ -224,6 +235,7 @@ export default function App() {
                 onOpenInLab={handleOpenInLab}
                 onStartTest={() => setCurrentView('test')}
                 onOpenLabBriefing={() => setIsLabTipsModalOpen(true)}
+                activeTest={activeTest}
               />
             )}
 
@@ -247,6 +259,7 @@ export default function App() {
                 onGoToLab={() => setCurrentView('practice')}
                 onStudentUpdated={(updated) => setStudent(updated)}
                 onLogout={handleStudentLogout}
+                activeTest={activeTest}
               />
             )}
 

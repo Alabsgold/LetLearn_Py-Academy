@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { AppView, StudentProfile } from '../types';
+import { AppView, StudentProfile, MentorTest } from '../types';
 import { 
   BookOpen, 
   Terminal, 
@@ -16,12 +16,14 @@ import {
   ShieldCheck, 
   ArrowLeftRight 
 } from 'lucide-react';
+import { formatDurationLabel } from '../services/testService';
 
 interface NavbarProps {
   currentView: AppView;
   onViewChange: (view: AppView) => void;
   activeTestCount: number;
   isSessionOpen?: boolean;
+  activeTest?: MentorTest | null;
   student?: StudentProfile | null;
   deviceRole?: 'student' | 'mentor' | null;
   onOpenStudentAuth?: () => void;
@@ -35,6 +37,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onViewChange, 
   activeTestCount, 
   isSessionOpen = true, 
+  activeTest,
   student,
   deviceRole,
   onOpenStudentAuth,
@@ -54,10 +57,16 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const isMentorMode = deviceRole === 'mentor';
 
+  const testBadge = !isSessionOpen
+    ? 'Closed'
+    : activeTest
+    ? formatDurationLabel(activeTest.durationMinutes) || 'Live'
+    : 'No Test';
+
   const baseItems = [
     { id: 'study' as AppView, label: 'Study Notes', shortLabel: 'Notes', icon: BookOpen, badge: null },
     { id: 'practice' as AppView, label: 'Python Lab', shortLabel: 'Lab', icon: Terminal, badge: null },
-    { id: 'test' as AppView, label: "Today's Test", shortLabel: 'Test', icon: Clock, badge: isSessionOpen ? 'PIN 0000' : 'Closed' },
+    { id: 'test' as AppView, label: "Today's Test", shortLabel: 'Test', icon: Clock, badge: testBadge },
   ];
 
   // For students: ONLY show Notes, Lab, Test, Dashboard. NO mentor tab.

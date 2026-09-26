@@ -70,7 +70,7 @@ export const StudentResultView: React.FC<StudentResultViewProps> = ({
             Congratulations, {studentName}!
           </h1>
           <p className="text-sm text-slate-300 max-w-lg mx-auto">
-            You have completed today's 1-Hour Python List & Functions Assessment. Here is your comprehensive evaluation.
+            You have completed today's Python Assessment. Here is your comprehensive evaluation.
           </p>
         </div>
 
