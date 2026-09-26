@@ -1,14 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { AppView } from '../types';
-import { BookOpen, Terminal, Clock, Lock, Share2, Check, Radio, Lightbulb } from 'lucide-react';
+import { AppView, StudentProfile } from '../types';
+import { 
+  BookOpen, 
+  Terminal, 
+  Clock, 
+  Lock, 
+  Share2, 
+  Check, 
+  Radio, 
+  Lightbulb, 
+  User, 
+  Flame, 
+  LogOut, 
+  ShieldCheck, 
+  ArrowLeftRight 
+} from 'lucide-react';
 
 interface NavbarProps {
   currentView: AppView;
   onViewChange: (view: AppView) => void;
   activeTestCount: number;
   isSessionOpen?: boolean;
+  student?: StudentProfile | null;
+  deviceRole?: 'student' | 'mentor' | null;
+  onOpenStudentAuth?: () => void;
   onOpenLabBriefing?: () => void;
+  onLogoutStudent?: () => void;
+  onSwitchToStudent?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ 
@@ -16,7 +35,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   onViewChange, 
   activeTestCount, 
   isSessionOpen = true, 
-  onOpenLabBriefing 
+  student,
+  deviceRole,
+  onOpenStudentAuth,
+  onOpenLabBriefing,
+  onLogoutStudent,
+  onSwitchToStudent
 }) => {
   const [copied, setCopied] = useState(false);
 
@@ -28,12 +52,37 @@ export const Navbar: React.FC<NavbarProps> = ({
     });
   };
 
-  const navItems = [
+  const isMentorMode = deviceRole === 'mentor';
+
+  const baseItems = [
     { id: 'study' as AppView, label: 'Study Notes', shortLabel: 'Notes', icon: BookOpen, badge: null },
     { id: 'practice' as AppView, label: 'Python Lab', shortLabel: 'Lab', icon: Terminal, badge: null },
     { id: 'test' as AppView, label: "Today's Test", shortLabel: 'Test', icon: Clock, badge: isSessionOpen ? 'PIN 0000' : 'Closed' },
-    { id: 'mentor' as AppView, label: 'Mentor', shortLabel: 'Mentor', icon: Lock, badge: activeTestCount > 0 ? `${activeTestCount}` : null }
   ];
+
+  // For students: ONLY show Notes, Lab, Test, Dashboard. NO mentor tab.
+  // For mentors: show Notes, Lab, Test, Mentor Portal.
+  const navItems = isMentorMode
+    ? [
+        ...baseItems,
+        { 
+          id: 'mentor' as AppView, 
+          label: 'Mentor Portal', 
+          shortLabel: 'Mentor', 
+          icon: Lock, 
+          badge: activeTestCount > 0 ? `${activeTestCount}` : null 
+        }
+      ]
+    : [
+        ...baseItems,
+        { 
+          id: 'student' as AppView, 
+          label: student ? `${student.name.split(' ')[0]}` : 'Dashboard', 
+          shortLabel: student ? `${student.name.split(' ')[0]}` : 'Dashboard', 
+          icon: User, 
+          badge: student ? `🔥 ${student.streak || 1}d` : null 
+        }
+      ];
 
   return (
     <>
@@ -121,18 +170,77 @@ export const Navbar: React.FC<NavbarProps> = ({
             })}
           </nav>
 
-          {/* Zone 3: Quick Action (Lab Tips + Share Student Test Link) */}
+          {/* Zone 3: Quick Action (Streak Badge / Student Login / Mentor Switch / Lab Tips / Share) */}
           <div className="flex items-center space-x-2">
+            {/* If in Mentor Mode, show Mentor Badge + Switch Role button */}
+            {isMentorMode ? (
+              <div className="flex items-center gap-1.5">
+                <span className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold">
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Mentor Mode</span>
+                </span>
+                {onSwitchToStudent && (
+                  <button
+                    onClick={onSwitchToStudent}
+                    title="Switch to Student View"
+                    className="flex items-center gap-1 px-2.5 py-1.5 liquid-glass-pill hover:bg-white/[0.08] text-slate-300 hover:text-white text-xs font-semibold rounded-xl transition border border-white/10"
+                  >
+                    <ArrowLeftRight className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="hidden sm:inline">Student View</span>
+                  </button>
+                )}
+              </div>
+            ) : student ? (
+              /* Student Profile & Quick Logout */
+              <div className="flex items-center gap-1.5">
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.94 }}
+                  onClick={() => onViewChange('student')}
+                  className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-mono font-bold hover:bg-amber-500/25 transition min-h-[36px]"
+                  title={`${student.name}'s Dashboard • Daily Streak`}
+                >
+                  <Flame className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                  <span>{student.streak || 1}d</span>
+                </motion.button>
+
+                {onLogoutStudent && (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.92 }}
+                    onClick={onLogoutStudent}
+                    title="Log Out of Student Account"
+                    className="p-2 liquid-glass-pill hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 rounded-xl transition border border-white/10 min-h-[36px]"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                  </motion.button>
+                )}
+              </div>
+            ) : (
+              onOpenStudentAuth && (
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.94 }}
+                  onClick={onOpenStudentAuth}
+                  className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 liquid-glass-pill hover:bg-white/[0.08] text-slate-200 text-xs font-semibold rounded-xl transition shadow-sm border border-white/10 min-h-[36px]"
+                  title="Sign in with your name & PIN"
+                >
+                  <User className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span className="hidden sm:inline">Student</span>
+                </motion.button>
+              )
+            )}
+
             {onOpenLabBriefing && (
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.94 }}
                 onClick={onOpenLabBriefing}
                 title="Open Coding Lab Entry Briefing & Python Tips"
-                className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 liquid-glass-pill hover:bg-white/[0.08] text-slate-200 text-xs font-semibold rounded-xl transition shadow-sm border border-white/10 min-h-[36px]"
+                className="hidden sm:flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 liquid-glass-pill hover:bg-white/[0.08] text-slate-200 text-xs font-semibold rounded-xl transition shadow-sm border border-white/10 min-h-[36px]"
               >
                 <Lightbulb className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span className="hidden sm:inline">Lab Tips</span>
+                <span>Lab Tips</span>
               </motion.button>
             )}
 

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { EvaluationResult } from '../utils/analytics';
 import { TEST_QUESTIONS } from '../data/testQuestions';
+import { TestQuestion } from '../types';
 import {
   Trophy,
   CheckCircle2,
@@ -19,6 +20,7 @@ import {
 interface StudentResultViewProps {
   studentName: string;
   evaluation: EvaluationResult;
+  questions?: TestQuestion[];
   onReviewStudy: () => void;
   onPracticeLab: () => void;
   onRetake: () => void;
@@ -27,10 +29,12 @@ interface StudentResultViewProps {
 export const StudentResultView: React.FC<StudentResultViewProps> = ({
   studentName,
   evaluation,
+  questions,
   onReviewStudy,
   onPracticeLab,
   onRetake
 }) => {
+  const activeQuestions = questions && questions.length > 0 ? questions : TEST_QUESTIONS;
   useEffect(() => {
     // Fire celebratory confetti if student scored >= 60%
     if (evaluation.percentage >= 60) {
@@ -202,12 +206,12 @@ export const StudentResultView: React.FC<StudentResultViewProps> = ({
             </p>
           </div>
           <span className="text-xs font-mono text-slate-400">
-            {TEST_QUESTIONS.length} Questions
+            {activeQuestions.length} Questions
           </span>
         </div>
 
         <div className="space-y-4">
-          {TEST_QUESTIONS.map((q, idx) => {
+          {activeQuestions.map((q, idx) => {
             const result = evaluation.questionResults[q.id];
             const isCorrect = result?.correct;
 

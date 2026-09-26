@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net: default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Student profiles: name, unique PIN, streaks, and completed curriculum modules
+    match /students/{studentId} {
+      allow read: if true;
+      allow create, update: if isValidId(studentId)
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 100;
+      allow delete: if false;
+    }
+
+    // Exam submissions: recorded test results
+    match /submissions/{submissionId} {
+      allow read: if true;
+      allow create: if isValidId(submissionId)
+        && request.resource.data.studentName is string
+        && request.resource.data.studentName.size() <= 100;
+      allow update, delete: if false;
+    }
+
+    // Mentor created and scheduled tests: lightweight tests collection
+    match /tests/{testId} {
+      allow read: if true;
+      allow write: if isValidId(testId);
+    }
+
+    // Flagged questions reported by students for mentor cross-checking and edits
+    match /flaggedQuestions/{flagId} {
+      allow read: if true;
+      allow write: if isValidId(flagId);
+    }
+
+    // Global settings: session state & mentor configuration
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isValidId(settingId);
+    }
+
+    // Connection test document
+    match /test/{docId} {
+      allow read, write: if true;
+    }
+  }
+}

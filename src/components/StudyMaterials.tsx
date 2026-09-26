@@ -23,6 +23,7 @@ import {
   TableProperties
 } from 'lucide-react';
 import { ProgressRing } from './ProgressRing';
+import { getStoredStudent, syncStudentModules } from '../services/studentService';
 
 interface StudyMaterialsProps {
   onOpenInLab: (code: string) => void;
@@ -65,7 +66,15 @@ export const StudyMaterials: React.FC<StudyMaterialsProps> = ({ onOpenInLab, onS
       } else {
         next.add(modId);
       }
-      localStorage.setItem('letlearn_py_completed_topics', JSON.stringify(Array.from(next)));
+      const list = Array.from(next);
+      localStorage.setItem('letlearn_py_completed_topics', JSON.stringify(list));
+
+      // Sync to Firebase in real-time
+      const currentStudent = getStoredStudent();
+      if (currentStudent?.id) {
+        syncStudentModules(currentStudent.id, list);
+      }
+
       return next;
     });
   };
@@ -74,11 +83,21 @@ export const StudyMaterials: React.FC<StudyMaterialsProps> = ({ onOpenInLab, onS
     const allIds = CURRICULUM_MODULES.map(m => m.id);
     setCompletedModules(new Set(allIds));
     localStorage.setItem('letlearn_py_completed_topics', JSON.stringify(allIds));
+
+    const currentStudent = getStoredStudent();
+    if (currentStudent?.id) {
+      syncStudentModules(currentStudent.id, allIds);
+    }
   };
 
   const handleResetProgress = () => {
     setCompletedModules(new Set());
     localStorage.removeItem('letlearn_py_completed_topics');
+
+    const currentStudent = getStoredStudent();
+    if (currentStudent?.id) {
+      syncStudentModules(currentStudent.id, []);
+    }
   };
 
   const categories = [

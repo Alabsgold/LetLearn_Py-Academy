@@ -1,40 +1,83 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { AppView } from './types';
+import { AppView, StudentProfile } from './types';
 import { Navbar } from './components/Navbar';
 import { StudyMaterials } from './components/StudyMaterials';
 import { PracticeLab } from './components/PracticeLab';
 import { TimedExam } from './components/TimedExam';
 import { InstructorDashboard } from './components/InstructorDashboard';
+import { StudentDashboard } from './components/StudentDashboard';
+import { StudentAuthModal } from './components/StudentAuthModal';
+import { WelcomeGateModal } from './components/WelcomeGateModal';
+import { LabTipsModal } from './components/LabTipsModal';
 import { OS26Loader } from './components/OS26Loader';
+import { getStoredStudent, clearStoredStudent } from './services/studentService';
 
 export default function App() {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  // 1. Initial Loader: Only runs ONCE per session to eliminate reloading delays across tabs
+  const [isLoading, setIsLoading] = useState<boolean>(() => {
+    return !sessionStorage.getItem('letlearn_py_intro_seen');
+  });
   const [isEntering, setIsEntering] = useState<boolean>(false);
   const [showWelcomeHUD, setShowWelcomeHUD] = useState<boolean>(false);
+
+  // 2. Navigation & Views
   const [currentView, setCurrentView] = useState<AppView>('study');
   const [labCode, setLabCode] = useState<string | undefined>(undefined);
   const [activeTestCount, setActiveTestCount] = useState<number>(0);
   const [isSessionOpen, setIsSessionOpen] = useState<boolean>(true);
 
+  // 3. Student auth state loaded from persistent local storage & synced to Firebase
+  const [student, setStudent] = useState<StudentProfile | null>(() => getStoredStudent());
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [isLabTipsModalOpen, setIsLabTipsModalOpen] = useState<boolean>(false);
+
+  // 4. Per-Device Role Management ('student' | 'mentor' | null)
+  const [deviceRole, setDeviceRole] = useState<'student' | 'mentor' | null>(() => {
+    const savedRole = localStorage.getItem('letlearn_py_device_role') as 'student' | 'mentor' | null;
+    if (savedRole) return savedRole;
+    if (getStoredStudent()) return 'student';
+    if (sessionStorage.getItem('letlearn_py_mentor_auth') === 'authorized') return 'mentor';
+    return null;
+  });
+
+  // 5. Welcome Gate Modal state (shown on first visit per device if not yet registered/authorized)
+  const [isWelcomeGateOpen, setIsWelcomeGateOpen] = useState<boolean>(() => {
+    const hasStudent = Boolean(getStoredStudent());
+    const isMentor = sessionStorage.getItem('letlearn_py_mentor_auth') === 'authorized';
+    return !hasStudent && !isMentor;
+  });
+
   const handleLoaderComplete = () => {
+    sessionStorage.setItem('letlearn_py_intro_seen', 'true');
     setIsLoading(false);
     setIsEntering(true);
     setShowWelcomeHUD(true);
-    setTimeout(() => setIsEntering(false), 900);
-    setTimeout(() => setShowWelcomeHUD(false), 3800);
+    setTimeout(() => setIsEntering(false), 800);
+    setTimeout(() => setShowWelcomeHUD(false), 3500);
+
+    // If device is not configured with student or mentor, open welcome gate
+    if (!student && deviceRole !== 'mentor') {
+      setIsWelcomeGateOpen(true);
+    }
   };
 
-  // Check URL query parameters for direct link (e.g. ?view=test or ?view=mentor)
+  // Check URL query parameters for direct links (e.g. ?view=test, ?view=mentor, ?role=mentor)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const viewParam = params.get('view') as AppView;
-    if (viewParam && ['study', 'practice', 'test', 'mentor'].includes(viewParam)) {
+    const roleParam = params.get('role');
+
+    if (roleParam === 'mentor' || viewParam === 'mentor') {
+      setDeviceRole('mentor');
+      setCurrentView('mentor');
+      setIsWelcomeGateOpen(false);
+    } else if (viewParam && ['study', 'practice', 'test', 'student'].includes(viewParam)) {
       setCurrentView(viewParam);
     }
   }, []);
 
-  // Consolidated low-overhead polling for test session and active student count (runs only when tab is visible)
+  // Live session status check
   useEffect(() => {
     const checkLiveSession = async () => {
       if (document.hidden) return;
@@ -64,45 +107,58 @@ export default function App() {
     setCurrentView('practice');
   };
 
+  // Student logs out: instant, smooth reset without window.location.reload()
+  const handleStudentLogout = () => {
+    clearStoredStudent();
+    localStorage.removeItem('letlearn_py_device_role');
+    setStudent(null);
+    setDeviceRole(null);
+    setIsWelcomeGateOpen(true);
+    setCurrentView('study');
+  };
+
+  // Mentor switches to student view
+  const handleSwitchToStudent = () => {
+    setDeviceRole('student');
+    setCurrentView('study');
+  };
+
   return (
     <div className="min-h-screen bg-[#040711] text-slate-100 flex flex-col font-sans selection:bg-amber-400 selection:text-slate-950 relative overflow-x-hidden">
-      {/* 1. OS26 Initial Liquid Glass Loading Screen */}
+      {/* 1. OS26 Initial Liquid Glass Loading Screen (Only runs ONCE per session) */}
       <AnimatePresence>
         {isLoading && (
           <OS26Loader onComplete={handleLoaderComplete} />
         )}
       </AnimatePresence>
 
-      {/* 2. Quantum Aperture Bloom & Warp Entrance Effect right after loader */}
+      {/* 2. Quantum Aperture Bloom & Warp Entrance Effect */}
       <AnimatePresence>
         {isEntering && (
           <motion.div
             key="quantum-entrance-burst"
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center overflow-hidden"
           >
-            {/* Central Flash Bloom Expansion */}
             <motion.div
               initial={{ scale: 0.2, opacity: 0.9 }}
               animate={{ scale: 3.2, opacity: 0 }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="w-[380px] h-[380px] rounded-full bg-gradient-to-r from-amber-400/35 via-blue-500/30 to-emerald-400/20 pointer-events-none"
             />
-
-            {/* Cyber Laser Streak Horizon Scanline */}
             <motion.div
               initial={{ opacity: 0.8, scaleX: 0 }}
               animate={{ opacity: [0.8, 1, 0], scaleX: [0, 1.8, 2.5] }}
-              transition={{ duration: 0.65, ease: 'easeOut' }}
+              transition={{ duration: 0.55, ease: 'easeOut' }}
               className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-amber-300 to-transparent shadow-[0_0_16px_#F59E0B] pointer-events-none"
             />
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* 3. Futuristic OS26 Lab Access Welcome HUD Banner */}
+      {/* 3. Welcome HUD Banner */}
       <AnimatePresence>
         {showWelcomeHUD && (
           <motion.div
@@ -125,7 +181,7 @@ export default function App() {
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 </div>
                 <span className="text-[10px] text-slate-400 font-mono">
-                  Python 3.12 Runtime Synchronized • 12 Modules & 18 Challenges Active
+                  Python 3.12 Runtime Synchronized • 12 Modules & Assessment Engine Active
                 </span>
               </div>
               <span className="text-[10px] text-amber-300/80 font-mono pl-1 border-l border-white/10 hidden sm:inline">
@@ -136,34 +192,38 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* 4. Zero-Overhead Static Atmospheric Glow Layer (Zero per-frame GPU computation) */}
+      {/* 4. Ambient Glow Background */}
       <div className="fixed inset-0 ambient-glow-layer pointer-events-none z-0" />
 
-      {/* 5. Top Floating Glass Navigation Bar */}
+      {/* 5. Top Navigation Bar (Role-filtered: Students only see their tabs; Mentors see Mentor Portal) */}
       <Navbar
         currentView={currentView}
         onViewChange={(view) => setCurrentView(view)}
         activeTestCount={activeTestCount}
         isSessionOpen={isSessionOpen}
-        onOpenLabBriefing={() => setIsLoading(true)}
+        student={student}
+        deviceRole={deviceRole}
+        onOpenStudentAuth={() => setIsAuthModalOpen(true)}
+        onOpenLabBriefing={() => setIsLabTipsModalOpen(true)}
+        onLogoutStudent={handleStudentLogout}
+        onSwitchToStudent={handleSwitchToStudent}
       />
 
-      {/* 6. Main Content Area with Optimized Fast Transitions */}
-      {/* pb-28 on mobile guarantees content is never clipped by the bottom dock */}
+      {/* 6. Main Content Area: Instant in-memory transitions with NO full-page reloading */}
       <main className="flex-1 relative z-10 pb-28 md:pb-16">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentView}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
           >
             {currentView === 'study' && (
               <StudyMaterials
                 onOpenInLab={handleOpenInLab}
                 onStartTest={() => setCurrentView('test')}
-                onOpenLabBriefing={() => setIsLoading(true)}
+                onOpenLabBriefing={() => setIsLabTipsModalOpen(true)}
               />
             )}
 
@@ -178,6 +238,18 @@ export default function App() {
               />
             )}
 
+            {currentView === 'student' && (
+              <StudentDashboard
+                student={student}
+                onOpenAuth={() => setIsAuthModalOpen(true)}
+                onGoToStudy={() => setCurrentView('study')}
+                onGoToTest={() => setCurrentView('test')}
+                onGoToLab={() => setCurrentView('practice')}
+                onStudentUpdated={(updated) => setStudent(updated)}
+                onLogout={handleStudentLogout}
+              />
+            )}
+
             {currentView === 'mentor' && (
               <InstructorDashboard />
             )}
@@ -185,8 +257,41 @@ export default function App() {
         </AnimatePresence>
       </main>
 
-      {/* 5. Minimalist Desktop Footer */}
-      <footer className="relative z-10 border-t border-white/[0.06] bg-slate-950/40 backdrop-blur-xl py-5 text-center text-xs text-slate-500 hidden md:block">
+      {/* First-Time Welcome Gate Modal (One-time per device or after logout, with tiny mentor dot at bottom) */}
+      <WelcomeGateModal
+        isOpen={isWelcomeGateOpen && !isLoading}
+        onStudentSuccess={(registeredStudent) => {
+          setStudent(registeredStudent);
+          setDeviceRole('student');
+          setIsWelcomeGateOpen(false);
+        }}
+        onMentorSuccess={() => {
+          setDeviceRole('mentor');
+          setCurrentView('mentor');
+          setIsWelcomeGateOpen(false);
+        }}
+      />
+
+      {/* Student Profile Quick Edit Modal */}
+      <StudentAuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={(loggedStudent) => {
+          setStudent(loggedStudent);
+          setDeviceRole('student');
+          setCurrentView('student');
+        }}
+      />
+
+      {/* Lightweight Lab Tips Modal (Opens instantaneously with ZERO page reload) */}
+      <LabTipsModal
+        isOpen={isLabTipsModalOpen}
+        onClose={() => setIsLabTipsModalOpen(false)}
+        onOpenInLab={handleOpenInLab}
+      />
+
+      {/* 5. Minimalist Desktop & Mobile Footer with Discreet Mentor Dot */}
+      <footer className="relative z-10 border-t border-white/[0.06] bg-slate-950/60 backdrop-blur-xl py-4 text-center text-xs text-slate-500">
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center space-x-2">
             <div className="w-5 h-5 rounded-md bg-amber-400 text-slate-950 font-bold font-mono text-[10px] flex items-center justify-center">
@@ -196,7 +301,7 @@ export default function App() {
           </div>
 
           <p className="text-slate-500 text-[11px]">
-            Minimalist Python Learning & Assessment • Student PIN: <code className="text-amber-300/80 font-mono">0000</code>
+            Minimalist Python 3 Learning & Assessment • Student PIN: <code className="text-amber-300/80 font-mono">0000</code>
           </p>
 
           <div className="flex items-center space-x-3 text-slate-400 text-[11px]">
@@ -211,9 +316,27 @@ export default function App() {
             <button onClick={() => setCurrentView('test')} className="hover:text-amber-400 transition">
               Test
             </button>
+            {deviceRole !== 'mentor' && (
+              <>
+                <span>•</span>
+                <button onClick={() => setCurrentView('student')} className="hover:text-amber-400 transition">
+                  Dashboard
+                </button>
+              </>
+            )}
+
+            {/* Discreet tiny mentor dot at bottom right (as requested by user) */}
             <span>•</span>
-            <button onClick={() => setCurrentView('mentor')} className="hover:text-amber-400 transition">
-              Mentor
+            <button
+              onClick={() => {
+                setDeviceRole('mentor');
+                setCurrentView('mentor');
+              }}
+              className="group p-1 text-slate-600 hover:text-amber-400 transition"
+              title="Instructor Access"
+              aria-label="Instructor Access"
+            >
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-amber-400 transition-colors" />
             </button>
           </div>
         </div>

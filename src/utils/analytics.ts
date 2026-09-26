@@ -13,25 +13,24 @@ export interface EvaluationResult {
 
 export function evaluateStudentSubmission(
   answers: Record<string, any>,
-  codeSubmissions?: Record<string, { code: string; passed: boolean; testOutput?: string }>
+  codeSubmissions?: Record<string, { code: string; passed: boolean; testOutput?: string }>,
+  questions?: TestQuestion[]
 ): EvaluationResult {
+  const activeQuestions = questions && questions.length > 0 ? questions : TEST_QUESTIONS;
   let score = 0;
-  const totalPossible = TEST_QUESTIONS.length;
+  const totalPossible = activeQuestions.length;
   const questionResults: Record<string, any> = {};
 
-  const topicTotals: Record<string, { correct: number; total: number }> = {
-    'Creation & Types': { correct: 0, total: 0 },
-    'Indexing & Slicing': { correct: 0, total: 0 },
-    'List Methods': { correct: 0, total: 0 },
-    'Input & Loops': { correct: 0, total: 0 },
-    'List Comprehension & Dictionaries': { correct: 0, total: 0 }
-  };
+  const topicTotals: Record<string, { correct: number; total: number }> = {};
 
   const improvementAreasMap: Map<string, string> = new Map();
   const strengthsMap: Map<string, string> = new Map();
 
-  for (const q of TEST_QUESTIONS) {
-    const category = q.topicCategory;
+  for (const q of activeQuestions) {
+    const category = q.topicCategory || 'General Assessment';
+    if (!topicTotals[category]) {
+      topicTotals[category] = { correct: 0, total: 0 };
+    }
     topicTotals[category].total += 1;
 
     let isCorrect = false;

@@ -1,4 +1,4 @@
-export type AppView = 'study' | 'practice' | 'test' | 'mentor';
+export type AppView = 'study' | 'practice' | 'test' | 'student' | 'mentor';
 
 export interface StudyModule {
   id: string;
@@ -28,7 +28,7 @@ export interface TestQuestion {
   id: string;
   type: QuestionType;
   topic: string;
-  topicCategory: 'Creation & Types' | 'Indexing & Slicing' | 'List Methods' | 'Input & Loops' | 'List Comprehension & Dictionaries';
+  topicCategory: 'Creation & Types' | 'Indexing & Slicing' | 'List Methods' | 'Input & Loops' | 'List Comprehension & Dictionaries' | string;
   title: string;
   prompt: string;
   codeSnippet?: string;
@@ -46,6 +46,47 @@ export interface TestQuestion {
     expected: string;
     description: string;
   }[];
+}
+
+export interface MentorTest {
+  id: string;
+  title: string;
+  topic: string;
+  extraInstructions?: string;
+  date: string;
+  time: string;
+  durationMinutes: number;
+  isScheduled: boolean;
+  isLive: boolean;
+  questionsCount: 5 | 10 | 15 | 20 | number;
+  questions: TestQuestion[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface FlaggedQuestion {
+  id: string;
+  testId?: string;
+  testTitle?: string;
+  questionId: string;
+  questionTitle: string;
+  studentName: string;
+  feedback: string;
+  status: 'pending' | 'resolved';
+  flaggedAt: string;
+}
+
+export interface StudentProfile {
+  id: string;
+  name: string;
+  pin?: string;
+  streak: number;
+  lastActiveDate: string; // YYYY-MM-DD
+  completedModules: string[];
+  totalTestsTaken: number;
+  highestScore: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface StudentSession {

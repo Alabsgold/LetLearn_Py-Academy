@@ -1,0 +1,110 @@
+{
+  "entities": {
+    "Student": {
+      "title": "Student",
+      "description": "A student profile tracking module progress, daily streaks, and test history.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 100 },
+        "pin": { "type": "string", "maxLength": 20 },
+        "streak": { "type": "number" },
+        "lastActiveDate": { "type": "string", "maxLength": 20 },
+        "completedModules": { "type": "array" },
+        "totalTestsTaken": { "type": "number" },
+        "highestScore": { "type": "number" },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "name"]
+    },
+    "TestSubmission": {
+      "title": "TestSubmission",
+      "description": "A test attempt submitted by a student.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "testId": { "type": "string", "maxLength": 128 },
+        "studentId": { "type": "string", "maxLength": 128 },
+        "studentName": { "type": "string", "maxLength": 100 },
+        "score": { "type": "number" },
+        "totalPossible": { "type": "number" },
+        "percentage": { "type": "number" },
+        "passed": { "type": "boolean" },
+        "submittedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "studentName", "score"]
+    },
+    "MentorTest": {
+      "title": "MentorTest",
+      "description": "A customized assessment test created by mentors with AI, lightweight questions, and schedule options.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "topic": { "type": "string", "maxLength": 300 },
+        "instructions": { "type": "string", "maxLength": 1000 },
+        "date": { "type": "string", "maxLength": 50 },
+        "time": { "type": "string", "maxLength": 50 },
+        "durationMinutes": { "type": "number" },
+        "isScheduled": { "type": "boolean" },
+        "isLive": { "type": "boolean" },
+        "questionsCount": { "type": "number" },
+        "questions": { "type": "array" },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "title", "questions"]
+    },
+    "FlaggedQuestion": {
+      "title": "FlaggedQuestion",
+      "description": "Question flagged by students during an exam for mentor review and correction.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "testId": { "type": "string", "maxLength": 128 },
+        "testTitle": { "type": "string", "maxLength": 200 },
+        "questionId": { "type": "string", "maxLength": 128 },
+        "questionTitle": { "type": "string", "maxLength": 200 },
+        "studentName": { "type": "string", "maxLength": 100 },
+        "feedback": { "type": "string", "maxLength": 1000 },
+        "status": { "type": "string", "maxLength": 50 },
+        "flaggedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "questionId", "studentName"]
+    },
+    "CohortSettings": {
+      "title": "CohortSettings",
+      "description": "Global test session state and mentor configurations.",
+      "type": "object",
+      "properties": {
+        "isSessionOpen": { "type": "boolean" },
+        "activeTestId": { "type": "string", "maxLength": 128 },
+        "mentorPin": { "type": "string", "maxLength": 30 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      }
+    }
+  },
+  "firestore": {
+    "/students/{studentId}": {
+      "schema": { "$ref": "#/entities/Student" },
+      "description": "Individual student profile, streak, and learning progress."
+    },
+    "/submissions/{submissionId}": {
+      "schema": { "$ref": "#/entities/TestSubmission" },
+      "description": "Submissions recorded for evaluation and mentor review."
+    },
+    "/tests/{testId}": {
+      "schema": { "$ref": "#/entities/MentorTest" },
+      "description": "Custom tests created by mentors."
+    },
+    "/flaggedQuestions/{flagId}": {
+      "schema": { "$ref": "#/entities/FlaggedQuestion" },
+      "description": "Questions flagged by students for mentor review."
+    },
+    "/settings/{settingId}": {
+      "schema": { "$ref": "#/entities/CohortSettings" },
+      "description": "Global session settings."
+    }
+  }
+}
