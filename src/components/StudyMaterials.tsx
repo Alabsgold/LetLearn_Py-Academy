@@ -442,7 +442,7 @@ export const StudyMaterials: React.FC<StudyMaterialsProps> = ({ onOpenInLab, onS
                 <article
                   key={module.id}
                   id={module.sectionId}
-                  className="liquid-glass rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 transition scroll-mt-24"
+                  className="liquid-glass rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 transition scroll-mt-24 study-module-card"
                 >
                   {/* Topic Header & Category Badge */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-4">

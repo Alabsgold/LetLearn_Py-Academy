@@ -77,7 +77,11 @@ export const TimedExam: React.FC<TimedExamProps> = ({ onGoToStudy, onGoToLab }) 
 
   useEffect(() => {
     checkServerSession();
-    const interval = setInterval(checkServerSession, 4000);
+    const interval = setInterval(() => {
+      if (!document.hidden) {
+        checkServerSession();
+      }
+    }, 8000);
     return () => clearInterval(interval);
   }, []);
 

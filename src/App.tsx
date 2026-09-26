@@ -15,13 +15,14 @@ export default function App() {
   const [currentView, setCurrentView] = useState<AppView>('study');
   const [labCode, setLabCode] = useState<string | undefined>(undefined);
   const [activeTestCount, setActiveTestCount] = useState<number>(0);
+  const [isSessionOpen, setIsSessionOpen] = useState<boolean>(true);
 
   const handleLoaderComplete = () => {
     setIsLoading(false);
     setIsEntering(true);
     setShowWelcomeHUD(true);
-    setTimeout(() => setIsEntering(false), 1200);
-    setTimeout(() => setShowWelcomeHUD(false), 4200);
+    setTimeout(() => setIsEntering(false), 900);
+    setTimeout(() => setShowWelcomeHUD(false), 3800);
   };
 
   // Check URL query parameters for direct link (e.g. ?view=test or ?view=mentor)
@@ -33,9 +34,10 @@ export default function App() {
     }
   }, []);
 
-  // Poll for active students taking test to show badge in navbar
+  // Consolidated low-overhead polling for test session and active student count (runs only when tab is visible)
   useEffect(() => {
-    const checkLiveCount = async () => {
+    const checkLiveSession = async () => {
+      if (document.hidden) return;
       try {
         const res = await fetch('/api/test/session-status');
         if (res.ok) {
@@ -43,14 +45,17 @@ export default function App() {
           if (data.activeCount !== undefined) {
             setActiveTestCount(data.activeCount);
           }
+          if (data.isOpen !== undefined) {
+            setIsSessionOpen(data.isOpen);
+          }
         }
       } catch (e) {
         // ignore in background
       }
     };
 
-    checkLiveCount();
-    const interval = setInterval(checkLiveCount, 4000);
+    checkLiveSession();
+    const interval = setInterval(checkLiveSession, 8000);
     return () => clearInterval(interval);
   }, []);
 
@@ -75,23 +80,23 @@ export default function App() {
             key="quantum-entrance-burst"
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center overflow-hidden"
           >
             {/* Central Flash Bloom Expansion */}
             <motion.div
-              initial={{ scale: 0.1, opacity: 0.95, filter: 'blur(0px)' }}
-              animate={{ scale: 3.6, opacity: 0, filter: 'blur(35px)' }}
-              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-              className="w-[420px] h-[420px] rounded-full bg-gradient-to-r from-amber-400/40 via-blue-500/35 to-emerald-400/25 pointer-events-none"
+              initial={{ scale: 0.2, opacity: 0.9 }}
+              animate={{ scale: 3.2, opacity: 0 }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              className="w-[380px] h-[380px] rounded-full bg-gradient-to-r from-amber-400/35 via-blue-500/30 to-emerald-400/20 pointer-events-none"
             />
 
             {/* Cyber Laser Streak Horizon Scanline */}
             <motion.div
               initial={{ opacity: 0.8, scaleX: 0 }}
-              animate={{ opacity: [0.8, 1, 0], scaleX: [0, 1.8, 2.8] }}
-              transition={{ duration: 0.75, ease: 'easeOut' }}
-              className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-amber-300 to-transparent shadow-[0_0_24px_#F59E0B] pointer-events-none"
+              animate={{ opacity: [0.8, 1, 0], scaleX: [0, 1.8, 2.5] }}
+              transition={{ duration: 0.65, ease: 'easeOut' }}
+              className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-amber-300 to-transparent shadow-[0_0_16px_#F59E0B] pointer-events-none"
             />
           </motion.div>
         )}
@@ -101,14 +106,14 @@ export default function App() {
       <AnimatePresence>
         {showWelcomeHUD && (
           <motion.div
-            initial={{ y: -60, opacity: 0, scale: 0.94 }}
+            initial={{ y: -50, opacity: 0, scale: 0.95 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: -30, opacity: 0, scale: 0.94 }}
+            exit={{ y: -30, opacity: 0, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 450, damping: 32 }}
             className="fixed top-16 sm:top-20 inset-x-0 mx-auto w-fit max-w-[92vw] z-50 pointer-events-auto cursor-pointer"
             onClick={() => setShowWelcomeHUD(false)}
           >
-            <div className="liquid-glass rounded-2xl px-4 py-2.5 shadow-2xl flex items-center space-x-3 border border-amber-400/30 bg-[#070c1a]/90 backdrop-blur-2xl">
+            <div className="liquid-glass rounded-2xl px-4 py-2.5 shadow-2xl flex items-center space-x-3 border border-amber-400/30 bg-[#070c1a]/90">
               <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-amber-400 to-blue-500 flex items-center justify-center font-mono font-black text-[11px] text-slate-950 shrink-0 shadow-md shadow-amber-500/30">
                 Py
               </div>
@@ -131,77 +136,28 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* 4. OS26 Liquid Glass Dynamic Background Physics */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        {/* Floating Orb 1: Cobalt Blue */}
-        <motion.div
-          animate={{
-            x: [0, 50, -40, 0],
-            y: [0, -45, 35, 0],
-            scale: [1, 1.2, 0.95, 1],
-            opacity: [0.18, 0.32, 0.22, 0.18]
-          }}
-          transition={{
-            duration: 16,
-            repeat: Infinity,
-            ease: 'easeInOut'
-          }}
-          className="absolute top-[-5%] left-[8%] w-[520px] h-[520px] rounded-full bg-blue-600/25 blur-[140px]"
-        />
+      {/* 4. Zero-Overhead Static Atmospheric Glow Layer (Zero per-frame GPU computation) */}
+      <div className="fixed inset-0 ambient-glow-layer pointer-events-none z-0" />
 
-        {/* Floating Orb 2: Python Amber Gold */}
-        <motion.div
-          animate={{
-            x: [0, -45, 35, 0],
-            y: [0, 50, -30, 0],
-            scale: [1, 1.15, 0.9, 1],
-            opacity: [0.14, 0.26, 0.18, 0.14]
-          }}
-          transition={{
-            duration: 18,
-            repeat: Infinity,
-            ease: 'easeInOut',
-            delay: 1.5
-          }}
-          className="absolute top-[30%] right-[6%] w-[480px] h-[480px] rounded-full bg-amber-500/20 blur-[150px]"
-        />
-
-        {/* Floating Orb 3: Deep Indigo Glow */}
-        <motion.div
-          animate={{
-            x: [0, 35, -45, 0],
-            y: [0, -35, 45, 0],
-            scale: [0.95, 1.25, 1, 0.95],
-            opacity: [0.12, 0.24, 0.15, 0.12]
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: 'easeInOut',
-            delay: 3
-          }}
-          className="absolute bottom-[5%] left-[22%] w-[600px] h-[600px] rounded-full bg-indigo-600/20 blur-[160px]"
-        />
-      </div>
-
-      {/* 3. Top Floating Glass Navigation Bar */}
+      {/* 5. Top Floating Glass Navigation Bar */}
       <Navbar
         currentView={currentView}
         onViewChange={(view) => setCurrentView(view)}
         activeTestCount={activeTestCount}
+        isSessionOpen={isSessionOpen}
         onOpenLabBriefing={() => setIsLoading(true)}
       />
 
-      {/* 4. Main Content Area with OS26 View Transitions */}
+      {/* 6. Main Content Area with Optimized Fast Transitions */}
       {/* pb-28 on mobile guarantees content is never clipped by the bottom dock */}
       <main className="flex-1 relative z-10 pb-28 md:pb-16">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentView}
-            initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -14, filter: 'blur(6px)' }}
-            transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
           >
             {currentView === 'study' && (
               <StudyMaterials

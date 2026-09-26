@@ -7,29 +7,18 @@ interface NavbarProps {
   currentView: AppView;
   onViewChange: (view: AppView) => void;
   activeTestCount: number;
+  isSessionOpen?: boolean;
   onOpenLabBriefing?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ currentView, onViewChange, activeTestCount, onOpenLabBriefing }) => {
+export const Navbar: React.FC<NavbarProps> = ({ 
+  currentView, 
+  onViewChange, 
+  activeTestCount, 
+  isSessionOpen = true, 
+  onOpenLabBriefing 
+}) => {
   const [copied, setCopied] = useState(false);
-  const [isSessionOpen, setIsSessionOpen] = useState(true);
-
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const res = await fetch('/api/test/session-status');
-        if (res.ok) {
-          const data = await res.json();
-          setIsSessionOpen(data.isOpen);
-        }
-      } catch (e) {
-        // ignore in background
-      }
-    };
-    checkSession();
-    const interval = setInterval(checkSession, 5000);
-    return () => clearInterval(interval);
-  }, []);
 
   const handleCopyStudentLink = () => {
     const url = `${window.location.origin}${window.location.pathname}?view=test`;

@@ -40,27 +40,24 @@ export const OS26Loader: React.FC<OS26LoaderProps> = ({ onComplete }) => {
   );
 
   // Total planned duration is ~13 seconds (within user's requested 10-20 seconds)
-  // 13,000ms total: tick every 65ms, adding approx 0.5% with minor organic fluctuations
+  // Low-overhead 110ms interval to prevent mobile CPU main-thread starvation
   useEffect(() => {
     const totalDurationMs = 13000;
-    const intervalMs = 65;
+    const intervalMs = 110;
     const incrementPerTick = (100 / (totalDurationMs / intervalMs));
 
     const timer = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(timer);
-          setTimeout(onComplete, 400);
+          setTimeout(onComplete, 250);
           return 100;
         }
 
-        // Slight organic variation
-        const jitter = (Math.random() - 0.5) * 0.15;
-        const next = Math.min(100, prev + incrementPerTick + jitter);
-
+        const next = Math.min(100, prev + incrementPerTick);
         if (next >= 100) {
           clearInterval(timer);
-          setTimeout(onComplete, 400);
+          setTimeout(onComplete, 250);
           return 100;
         }
         return next;
@@ -131,33 +128,13 @@ export const OS26Loader: React.FC<OS26LoaderProps> = ({ onComplete }) => {
       initial={{ opacity: 1 }}
       exit={{
         opacity: 0,
-        scale: 1.03,
-        filter: 'blur(16px)',
-        transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] }
+        scale: 1.02,
+        transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] }
       }}
       className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#030610] text-slate-100 overflow-y-auto px-3 sm:px-6 py-6 select-none"
     >
-      {/* OS26 Ambient Floating Refraction Orbs */}
-      <motion.div
-        animate={{
-          scale: [1, 1.3, 0.9, 1],
-          opacity: [0.2, 0.42, 0.25, 0.2],
-          x: [0, 45, -35, 0],
-          y: [0, -35, 25, 0]
-        }}
-        transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
-        className="fixed w-[520px] h-[520px] rounded-full bg-blue-600/25 blur-[140px] pointer-events-none"
-      />
-      <motion.div
-        animate={{
-          scale: [0.95, 1.25, 1, 0.95],
-          opacity: [0.18, 0.38, 0.2, 0.18],
-          x: [0, -45, 35, 0],
-          y: [0, 35, -25, 0]
-        }}
-        transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}
-        className="fixed w-[460px] h-[460px] rounded-full bg-amber-500/20 blur-[150px] pointer-events-none"
-      />
+      {/* Zero-Overhead Ambient Atmospheric Glow Layer */}
+      <div className="fixed inset-0 ambient-glow-layer pointer-events-none" />
 
       {/* Main Glass Laboratory Entry HUD */}
       <motion.div
