@@ -10,9 +10,19 @@ import { OS26Loader } from './components/OS26Loader';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isEntering, setIsEntering] = useState<boolean>(false);
+  const [showWelcomeHUD, setShowWelcomeHUD] = useState<boolean>(false);
   const [currentView, setCurrentView] = useState<AppView>('study');
   const [labCode, setLabCode] = useState<string | undefined>(undefined);
   const [activeTestCount, setActiveTestCount] = useState<number>(0);
+
+  const handleLoaderComplete = () => {
+    setIsLoading(false);
+    setIsEntering(true);
+    setShowWelcomeHUD(true);
+    setTimeout(() => setIsEntering(false), 1200);
+    setTimeout(() => setShowWelcomeHUD(false), 4200);
+  };
 
   // Check URL query parameters for direct link (e.g. ?view=test or ?view=mentor)
   useEffect(() => {
@@ -54,11 +64,74 @@ export default function App() {
       {/* 1. OS26 Initial Liquid Glass Loading Screen */}
       <AnimatePresence>
         {isLoading && (
-          <OS26Loader onComplete={() => setIsLoading(false)} />
+          <OS26Loader onComplete={handleLoaderComplete} />
         )}
       </AnimatePresence>
 
-      {/* 2. OS26 Liquid Glass Dynamic Background Physics */}
+      {/* 2. Quantum Aperture Bloom & Warp Entrance Effect right after loader */}
+      <AnimatePresence>
+        {isEntering && (
+          <motion.div
+            key="quantum-entrance-burst"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center overflow-hidden"
+          >
+            {/* Central Flash Bloom Expansion */}
+            <motion.div
+              initial={{ scale: 0.1, opacity: 0.95, filter: 'blur(0px)' }}
+              animate={{ scale: 3.6, opacity: 0, filter: 'blur(35px)' }}
+              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+              className="w-[420px] h-[420px] rounded-full bg-gradient-to-r from-amber-400/40 via-blue-500/35 to-emerald-400/25 pointer-events-none"
+            />
+
+            {/* Cyber Laser Streak Horizon Scanline */}
+            <motion.div
+              initial={{ opacity: 0.8, scaleX: 0 }}
+              animate={{ opacity: [0.8, 1, 0], scaleX: [0, 1.8, 2.8] }}
+              transition={{ duration: 0.75, ease: 'easeOut' }}
+              className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-amber-300 to-transparent shadow-[0_0_24px_#F59E0B] pointer-events-none"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 3. Futuristic OS26 Lab Access Welcome HUD Banner */}
+      <AnimatePresence>
+        {showWelcomeHUD && (
+          <motion.div
+            initial={{ y: -60, opacity: 0, scale: 0.94 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            exit={{ y: -30, opacity: 0, scale: 0.94 }}
+            transition={{ type: 'spring', stiffness: 450, damping: 32 }}
+            className="fixed top-16 sm:top-20 inset-x-0 mx-auto w-fit max-w-[92vw] z-50 pointer-events-auto cursor-pointer"
+            onClick={() => setShowWelcomeHUD(false)}
+          >
+            <div className="liquid-glass rounded-2xl px-4 py-2.5 shadow-2xl flex items-center space-x-3 border border-amber-400/30 bg-[#070c1a]/90 backdrop-blur-2xl">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-amber-400 to-blue-500 flex items-center justify-center font-mono font-black text-[11px] text-slate-950 shrink-0 shadow-md shadow-amber-500/30">
+                Py
+              </div>
+              <div className="flex flex-col">
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs font-bold text-white tracking-tight">
+                    LetLearn_Py Coding Lab Ready
+                  </span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                </div>
+                <span className="text-[10px] text-slate-400 font-mono">
+                  Python 3.12 Runtime Synchronized • 12 Modules & 18 Challenges Active
+                </span>
+              </div>
+              <span className="text-[10px] text-amber-300/80 font-mono pl-1 border-l border-white/10 hidden sm:inline">
+                Tap to dismiss
+              </span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 4. OS26 Liquid Glass Dynamic Background Physics */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {/* Floating Orb 1: Cobalt Blue */}
         <motion.div

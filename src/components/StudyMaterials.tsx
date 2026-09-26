@@ -22,6 +22,7 @@ import {
   Lightbulb,
   TableProperties
 } from 'lucide-react';
+import { ProgressRing } from './ProgressRing';
 
 interface StudyMaterialsProps {
   onOpenInLab: (code: string) => void;
@@ -67,6 +68,17 @@ export const StudyMaterials: React.FC<StudyMaterialsProps> = ({ onOpenInLab, onS
       localStorage.setItem('letlearn_py_completed_topics', JSON.stringify(Array.from(next)));
       return next;
     });
+  };
+
+  const handleMarkAllCompleted = () => {
+    const allIds = CURRICULUM_MODULES.map(m => m.id);
+    setCompletedModules(new Set(allIds));
+    localStorage.setItem('letlearn_py_completed_topics', JSON.stringify(allIds));
+  };
+
+  const handleResetProgress = () => {
+    setCompletedModules(new Set());
+    localStorage.removeItem('letlearn_py_completed_topics');
   };
 
   const categories = [
@@ -202,6 +214,14 @@ export const StudyMaterials: React.FC<StudyMaterialsProps> = ({ onOpenInLab, onS
         {/* Ambient lighting effect */}
         <div className="absolute -right-12 -bottom-12 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
       </div>
+
+      {/* Visual Study Progress Ring & Curriculum Tracker */}
+      <ProgressRing
+        completedCount={completedModules.size}
+        totalCount={CURRICULUM_MODULES.length}
+        onMarkAll={handleMarkAllCompleted}
+        onReset={handleResetProgress}
+      />
 
       {/* Visual Reference Cards: Indexing and Methods CheatSheet */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
