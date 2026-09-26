@@ -484,28 +484,28 @@ export const TimedExam: React.FC<TimedExamProps> = ({ onGoToStudy, onGoToLab }) 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
       {/* Sticky Liquid Glass Top Bar */}
-      <div className="liquid-glass rounded-2xl p-3.5 shadow-xl flex items-center justify-between sticky top-16 z-30">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 font-bold text-xs">
+      <div className="liquid-glass rounded-2xl p-3 sm:p-3.5 shadow-xl flex items-center justify-between sticky top-16 sm:top-20 z-30 gap-2">
+        <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0">
+          <div className="w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 font-bold text-xs shrink-0">
             {studentName.charAt(0).toUpperCase()}
           </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <span className="text-xs font-bold text-white">{studentName}</span>
-              <span className="flex items-center text-[10px] text-emerald-400">
+          <div className="min-w-0">
+            <div className="flex items-center space-x-1.5 sm:space-x-2">
+              <span className="text-xs font-bold text-white truncate max-w-[100px] sm:max-w-none">{studentName}</span>
+              <span className="flex items-center text-[10px] text-emerald-400 shrink-0">
                 <Radio className="w-2.5 h-2.5 mr-1 animate-pulse" />
                 Live
               </span>
             </div>
-            <div className="text-[10px] text-slate-400">
+            <div className="text-[10px] text-slate-400 font-mono">
               Q{currentQuestionIndex + 1} of {TEST_QUESTIONS.length}
             </div>
           </div>
         </div>
 
-        {/* 1-Hour Countdown */}
-        <div className="flex items-center space-x-3">
-          <div className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl font-mono text-xs font-bold liquid-glass-pill ${
+        {/* 1-Hour Countdown & Submit */}
+        <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+          <div className={`flex items-center space-x-1 sm:space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl font-mono text-xs font-bold liquid-glass-pill ${
             timeRemaining <= 300 ? 'text-rose-400 border-rose-500/50 animate-pulse' : 'text-emerald-400 border-emerald-500/30'
           }`}>
             <Clock className="w-3.5 h-3.5" />
@@ -518,7 +518,7 @@ export const TimedExam: React.FC<TimedExamProps> = ({ onGoToStudy, onGoToLab }) 
                 handleSubmitTest();
               }
             }}
-            className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition active:scale-95 flex items-center space-x-1"
+            className="px-3 sm:px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition active:scale-95 flex items-center space-x-1 min-h-[36px]"
           >
             <Send className="w-3 h-3" />
             <span>Submit</span>
@@ -527,13 +527,13 @@ export const TimedExam: React.FC<TimedExamProps> = ({ onGoToStudy, onGoToLab }) 
       </div>
 
       {/* Question Selector Palette Drawer */}
-      <div className="liquid-glass rounded-2xl p-3.5 space-y-2">
+      <div className="liquid-glass rounded-2xl p-3 sm:p-3.5 space-y-2">
         <div className="flex items-center justify-between text-[11px] text-slate-400">
-          <span>Question Drawer</span>
-          <span>{answeredCount} of {TEST_QUESTIONS.length} Answered</span>
+          <span className="font-semibold text-slate-300">Question Palette</span>
+          <span className="font-mono text-amber-300">{answeredCount} of {TEST_QUESTIONS.length} Answered</span>
         </div>
 
-        <div className="grid grid-cols-9 sm:grid-cols-18 gap-1">
+        <div className="grid grid-cols-6 sm:grid-cols-9 md:grid-cols-18 gap-1.5">
           {TEST_QUESTIONS.map((q, idx) => {
             const hasAns = q.type === 'coding_challenge'
               ? Boolean(codeSubmissions[q.id]?.passed)
@@ -541,16 +541,16 @@ export const TimedExam: React.FC<TimedExamProps> = ({ onGoToStudy, onGoToLab }) 
             const isFlagged = flaggedQuestions.has(q.id);
             const isCurrent = idx === currentQuestionIndex;
 
-            let cls = 'bg-slate-900/60 text-slate-400 border-white/[0.05] hover:bg-white/[0.05]';
-            if (hasAns) cls = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 font-bold';
-            if (isFlagged) cls = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
-            if (isCurrent) cls = 'ring-2 ring-blue-500 bg-blue-600 text-white font-bold';
+            let cls = 'bg-slate-900/60 text-slate-400 border-white/[0.08] hover:bg-white/[0.08]';
+            if (hasAns) cls = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 font-bold';
+            if (isFlagged) cls = 'bg-amber-500/20 text-amber-300 border-amber-500/50';
+            if (isCurrent) cls = 'ring-2 ring-blue-500 bg-blue-600 text-white font-bold shadow-lg shadow-blue-500/30';
 
             return (
               <button
                 key={q.id}
                 onClick={() => setCurrentQuestionIndex(idx)}
-                className={`py-1 text-[11px] font-mono rounded-lg border transition ${cls}`}
+                className={`h-8 sm:h-7 text-xs font-mono rounded-lg border transition active:scale-95 flex items-center justify-center ${cls}`}
               >
                 {idx + 1}
               </button>

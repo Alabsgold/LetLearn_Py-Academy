@@ -130,22 +130,24 @@ export const StudyMaterials: React.FC<StudyMaterialsProps> = ({ onOpenInLab, onS
     }
   };
 
+  const [mobileTocOpen, setMobileTocOpen] = useState(false);
+
   const completedPct = Math.round((completedModules.size / CURRICULUM_MODULES.length) * 100);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8 space-y-6 sm:space-y-8">
       {/* Top Welcome & Orientation Hero */}
-      <div className="relative overflow-hidden rounded-3xl liquid-glass p-6 md:p-8 shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl liquid-glass p-5 sm:p-8 shadow-2xl">
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/20 text-amber-300 text-xs font-semibold">
               <Sparkles className="w-3.5 h-3.5" />
               <span>LetLearn_Py • Official Study Guide</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-white">
               Python Lists & Core Foundations
             </h1>
-            <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
+            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
               Carefully organized study materials for our cohort. Covers list creation, mutability, positive & negative indexing, built-in methods (<code className="text-amber-300 font-mono text-xs">append</code>, <code className="text-amber-300 font-mono text-xs">insert</code>, <code className="text-amber-300 font-mono text-xs">extend</code>), user <code className="text-amber-300 font-mono text-xs">input()</code> typecasting, <code className="text-amber-300 font-mono text-xs">split()</code> with <code className="text-amber-300 font-mono text-xs">for</code> loops, slicing, removing items, and list comprehensions.
             </p>
 
@@ -157,7 +159,7 @@ export const StudyMaterials: React.FC<StudyMaterialsProps> = ({ onOpenInLab, onS
                   <span className="font-semibold">Your Study Progress:</span>
                 </span>
                 <span className="font-mono text-amber-300 font-bold">
-                  {completedModules.size} of {CURRICULUM_MODULES.length} topics reviewed ({completedPct}%)
+                  {completedModules.size} of {CURRICULUM_MODULES.length} reviewed ({completedPct}%)
                 </span>
               </div>
               <div className="w-full bg-black/40 rounded-full h-1.5 overflow-hidden border border-white/[0.08]">
@@ -169,17 +171,17 @@ export const StudyMaterials: React.FC<StudyMaterialsProps> = ({ onOpenInLab, onS
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0">
+          <div className="flex flex-col sm:flex-row lg:flex-col gap-2.5 sm:gap-3 shrink-0">
             <button
               onClick={onStartTest}
-              className="flex items-center justify-center space-x-2 px-5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm shadow-xl shadow-blue-500/25 transition active:scale-95"
+              className="flex items-center justify-center space-x-2 px-5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm shadow-xl shadow-blue-500/25 transition active:scale-95 min-h-[44px]"
             >
               <BookOpen className="w-4 h-4" />
               <span>Take Today's Test (1h)</span>
             </button>
             <button
               onClick={() => onOpenInLab('# Write and practice any Python code\nmyList = [1, "string", 9.10]\nprint("Initial list:", myList)')}
-              className="flex items-center justify-center space-x-2 px-5 py-3 rounded-xl liquid-glass-pill hover:bg-white/[0.08] text-amber-300 font-semibold text-xs sm:text-sm transition"
+              className="flex items-center justify-center space-x-2 px-5 py-3 rounded-xl liquid-glass-pill hover:bg-white/[0.08] text-amber-300 font-semibold text-xs sm:text-sm transition min-h-[44px]"
             >
               <Terminal className="w-4 h-4" />
               <span>Open Python Lab</span>
@@ -192,12 +194,12 @@ export const StudyMaterials: React.FC<StudyMaterialsProps> = ({ onOpenInLab, onS
       </div>
 
       {/* Visual Reference Cards: Indexing and Methods CheatSheet */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Card 1: Visual Indexing & Negative Indexing */}
-        <div className="liquid-glass rounded-3xl p-5 sm:p-6 space-y-4 shadow-xl">
+        <div className="liquid-glass rounded-3xl p-4 sm:p-6 space-y-4 shadow-xl">
           <div className="flex items-center space-x-2">
             <Layers className="w-5 h-5 text-amber-400" />
-            <h2 className="text-base font-bold text-white">Visual Blueprint: Positive vs Negative Indexing</h2>
+            <h2 className="text-sm sm:text-base font-bold text-white">Visual Blueprint: Positive vs Negative Indexing</h2>
           </div>
           <p className="text-xs text-slate-300">
             In Python, positive indexing starts at <code className="text-emerald-400 font-mono">0</code> on the left. Negative indexing starts at <code className="text-blue-400 font-mono">-1</code> at the very end and counts backwards:
@@ -243,46 +245,48 @@ export const StudyMaterials: React.FC<StudyMaterialsProps> = ({ onOpenInLab, onS
         </div>
 
         {/* Card 2: Essential List Methods Comparison Table */}
-        <div className="liquid-glass rounded-3xl p-5 sm:p-6 space-y-4 shadow-xl">
+        <div className="liquid-glass rounded-3xl p-4 sm:p-6 space-y-4 shadow-xl">
           <div className="flex items-center space-x-2">
             <TableProperties className="w-5 h-5 text-amber-400" />
-            <h2 className="text-base font-bold text-white">Methods Quick-Lookup: Arguments & Behavior</h2>
+            <h2 className="text-sm sm:text-base font-bold text-white">Methods Quick-Lookup: Arguments & Behavior</h2>
           </div>
           <p className="text-xs text-slate-300">
             Keep these strict argument rules in mind for test questions and coding exercises:
           </p>
 
-          <div className="bg-black/40 border border-white/[0.08] rounded-2xl overflow-hidden text-xs">
-            <div className="grid grid-cols-3 bg-white/[0.02] p-2 font-mono text-[11px] font-bold text-slate-400 border-b border-white/[0.06]">
-              <span>Method</span>
-              <span>Arguments</span>
-              <span>Effect & Placement</span>
-            </div>
-            <div className="divide-y divide-white/[0.04] font-mono text-[11px]">
-              <div className="grid grid-cols-3 p-2 text-slate-200">
-                <span className="text-amber-400 font-bold">append(x)</span>
-                <span>Strictly 1 arg</span>
-                <span className="text-slate-400">Adds item to the end</span>
+          <div className="bg-black/40 border border-white/[0.08] rounded-2xl overflow-x-auto text-xs">
+            <div className="min-w-[360px]">
+              <div className="grid grid-cols-3 bg-white/[0.02] p-2 font-mono text-[11px] font-bold text-slate-400 border-b border-white/[0.06]">
+                <span>Method</span>
+                <span>Arguments</span>
+                <span>Effect & Placement</span>
               </div>
-              <div className="grid grid-cols-3 p-2 text-slate-200">
-                <span className="text-amber-400 font-bold">insert(idx, x)</span>
-                <span>2 args (index, val)</span>
-                <span className="text-slate-400">Inserts at specific position</span>
-              </div>
-              <div className="grid grid-cols-3 p-2 text-slate-200">
-                <span className="text-amber-400 font-bold">extend(list)</span>
-                <span>1 arg (iterable)</span>
-                <span className="text-slate-400">Appends all items from list</span>
-              </div>
-              <div className="grid grid-cols-3 p-2 text-slate-200">
-                <span className="text-amber-400 font-bold">pop(idx?)</span>
-                <span>0 or 1 index arg</span>
-                <span className="text-emerald-400">Removes & RETURNS item</span>
-              </div>
-              <div className="grid grid-cols-3 p-2 text-slate-200">
-                <span className="text-amber-400 font-bold">remove(val)</span>
-                <span>1 value arg</span>
-                <span className="text-slate-400">Removes by value (returns None)</span>
+              <div className="divide-y divide-white/[0.04] font-mono text-[11px]">
+                <div className="grid grid-cols-3 p-2 text-slate-200">
+                  <span className="text-amber-400 font-bold">append(x)</span>
+                  <span>Strictly 1 arg</span>
+                  <span className="text-slate-400">Adds item to the end</span>
+                </div>
+                <div className="grid grid-cols-3 p-2 text-slate-200">
+                  <span className="text-amber-400 font-bold">insert(idx, x)</span>
+                  <span>2 args (index, val)</span>
+                  <span className="text-slate-400">Inserts at position</span>
+                </div>
+                <div className="grid grid-cols-3 p-2 text-slate-200">
+                  <span className="text-amber-400 font-bold">extend(list)</span>
+                  <span>1 arg (iterable)</span>
+                  <span className="text-slate-400">Appends all items</span>
+                </div>
+                <div className="grid grid-cols-3 p-2 text-slate-200">
+                  <span className="text-amber-400 font-bold">pop(idx?)</span>
+                  <span>0 or 1 index arg</span>
+                  <span className="text-emerald-400">Removes & RETURNS</span>
+                </div>
+                <div className="grid grid-cols-3 p-2 text-slate-200">
+                  <span className="text-amber-400 font-bold">remove(val)</span>
+                  <span>1 value arg</span>
+                  <span className="text-slate-400">Removes by value</span>
+                </div>
               </div>
             </div>
           </div>
@@ -290,82 +294,95 @@ export const StudyMaterials: React.FC<StudyMaterialsProps> = ({ onOpenInLab, onS
       </div>
 
       {/* Main 2-Column Layout: Sidebar Table of Contents + Main Study Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Sticky Sidebar: Navigation & Topic Tracker (4 cols) */}
-        <div className="lg:col-span-4 sticky top-24 space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
+        {/* Left Sidebar: Navigation & Topic Tracker (4 cols) */}
+        <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-4">
           <div className="liquid-glass rounded-3xl p-4 shadow-xl space-y-3">
             <div className="flex items-center justify-between pb-2 border-b border-white/[0.08]">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center space-x-1.5">
                 <ListOrdered className="w-4 h-4 text-amber-400" />
-                <span>Agenda Topics ({CURRICULUM_MODULES.length})</span>
+                <span>Topics ({CURRICULUM_MODULES.length})</span>
               </span>
-              <span className="text-[10px] font-mono text-emerald-400 font-bold">
-                {completedModules.size} Done
-              </span>
+              <div className="flex items-center space-x-2">
+                <span className="text-[10px] font-mono text-emerald-400 font-bold">
+                  {completedModules.size} Done
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setMobileTocOpen(!mobileTocOpen)}
+                  className="lg:hidden text-xs text-amber-400 font-semibold px-2 py-1 rounded bg-amber-400/10 border border-amber-400/20"
+                >
+                  {mobileTocOpen ? 'Hide Topics' : 'Show Topics'}
+                </button>
+              </div>
             </div>
 
-            {/* Quick Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search topics or methods..."
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 liquid-glass-input rounded-xl text-slate-100 placeholder-slate-500 text-xs focus:outline-none focus:ring-1 focus:ring-amber-400"
-              />
-            </div>
+            {/* Quick Search & Category Filter */}
+            <div className={`space-y-2 ${mobileTocOpen ? 'block' : 'hidden lg:block'}`}>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search topics or methods..."
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  className="w-full pl-9 pr-3 py-1.5 liquid-glass-input rounded-xl text-slate-100 placeholder-slate-500 text-xs focus:outline-none focus:ring-1 focus:ring-amber-400"
+                />
+              </div>
 
-            {/* Category Filter dropdown */}
-            <select
-              value={selectedCategory}
-              onChange={e => setSelectedCategory(e.target.value)}
-              className="w-full px-2.5 py-1.5 liquid-glass-input rounded-xl text-xs text-amber-300 font-medium focus:outline-none focus:ring-1 focus:ring-amber-400"
-            >
-              {categories.map(c => (
-                <option key={c} value={c} className="bg-slate-900 text-white">Category: {c}</option>
-              ))}
-            </select>
+              <select
+                value={selectedCategory}
+                onChange={e => setSelectedCategory(e.target.value)}
+                className="w-full px-2.5 py-1.5 liquid-glass-input rounded-xl text-xs text-amber-300 font-medium focus:outline-none focus:ring-1 focus:ring-amber-400"
+              >
+                {categories.map(c => (
+                  <option key={c} value={c} className="bg-slate-900 text-white">Category: {c}</option>
+                ))}
+              </select>
 
-            {/* Topic Navigation Links */}
-            <div className="space-y-1 max-h-[460px] overflow-y-auto pr-1">
-              {filteredModules.map((mod, idx) => {
-                const isCompleted = completedModules.has(mod.id);
-                const isActive = activeSectionId === mod.sectionId;
+              {/* Topic Navigation Links */}
+              <div className="space-y-1 max-h-[380px] lg:max-h-[460px] overflow-y-auto pr-1">
+                {filteredModules.map((mod, idx) => {
+                  const isCompleted = completedModules.has(mod.id);
+                  const isActive = activeSectionId === mod.sectionId;
 
-                return (
-                  <div
-                    key={mod.id}
-                    className={`flex items-center justify-between p-2 rounded-xl text-xs transition cursor-pointer group ${
-                      isActive
-                        ? 'liquid-glass-pill border-amber-400/30 text-amber-300 font-semibold'
-                        : 'hover:bg-white/[0.04] text-slate-300'
-                    }`}
-                    onClick={() => scrollToSection(mod.sectionId)}
-                  >
-                    <div className="flex items-center space-x-2 truncate">
-                      <span className="w-5 h-5 rounded-md bg-black/40 border border-white/10 flex items-center justify-center text-[10px] font-mono text-slate-400 shrink-0">
-                        {idx + 1}
-                      </span>
-                      <span className="truncate font-medium">{mod.title.replace(/^\d+\.\s*/, '')}</span>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleModuleCompletion(mod.id);
-                      }}
-                      title={isCompleted ? 'Marked as reviewed' : 'Click to mark as reviewed'}
-                      className={`p-1 rounded transition shrink-0 ml-1 ${
-                        isCompleted ? 'text-emerald-400' : 'text-slate-600 hover:text-slate-400'
+                  return (
+                    <div
+                      key={mod.id}
+                      className={`flex items-center justify-between p-2 rounded-xl text-xs transition cursor-pointer group ${
+                        isActive
+                          ? 'liquid-glass-pill border-amber-400/30 text-amber-300 font-semibold'
+                          : 'hover:bg-white/[0.04] text-slate-300'
                       }`}
+                      onClick={() => {
+                        scrollToSection(mod.sectionId);
+                        setMobileTocOpen(false);
+                      }}
                     >
-                      <CheckCircle2 className={`w-4 h-4 ${isCompleted ? 'fill-emerald-950 text-emerald-400' : ''}`} />
-                    </button>
-                  </div>
-                );
-              })}
+                      <div className="flex items-center space-x-2 truncate">
+                        <span className="w-5 h-5 rounded-md bg-black/40 border border-white/10 flex items-center justify-center text-[10px] font-mono text-slate-400 shrink-0">
+                          {idx + 1}
+                        </span>
+                        <span className="truncate font-medium">{mod.title.replace(/^\d+\.\s*/, '')}</span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleModuleCompletion(mod.id);
+                        }}
+                        title={isCompleted ? 'Marked as reviewed' : 'Click to mark as reviewed'}
+                        className={`p-1 rounded transition shrink-0 ml-1 ${
+                          isCompleted ? 'text-emerald-400' : 'text-slate-600 hover:text-slate-400'
+                        }`}
+                      >
+                        <CheckCircle2 className={`w-4 h-4 ${isCompleted ? 'fill-emerald-950 text-emerald-400' : ''}`} />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -477,16 +494,16 @@ export const StudyMaterials: React.FC<StudyMaterialsProps> = ({ onOpenInLab, onS
 
                   {/* Interactive Code Snippet with Live Inline Terminal Runner */}
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between text-xs text-slate-400 font-mono">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 font-mono">
                       <div className="flex items-center space-x-1.5 text-slate-300">
-                        <Code2 className="w-4 h-4 text-amber-400" />
+                        <Code2 className="w-4 h-4 text-amber-400 shrink-0" />
                         <span className="font-semibold">Code Example:</span>
                       </div>
 
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => handleCopyCode(module.codeExample, module.id)}
-                          className="hover:text-white flex items-center space-x-1 text-[11px]"
+                          className="hover:text-white flex items-center space-x-1 text-[11px] p-1"
                         >
                           {copiedId === module.id ? (
                             <>
@@ -494,17 +511,17 @@ export const StudyMaterials: React.FC<StudyMaterialsProps> = ({ onOpenInLab, onS
                               <span className="text-emerald-400">Copied</span>
                             </>
                           ) : (
-                            <span>Copy Code</span>
+                            <span>Copy</span>
                           )}
                         </button>
 
                         <button
                           onClick={() => handleRunInlineSnippet(module.codeExample, module.id)}
                           disabled={isRunningSnippet === module.id}
-                          className="flex items-center space-x-1.5 px-3 py-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-[11px] rounded-lg transition active:scale-95 disabled:opacity-50"
+                          className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-[11px] rounded-lg transition active:scale-95 disabled:opacity-50 min-h-[30px]"
                         >
                           <Play className="w-3 h-3 fill-current" />
-                          <span>{isRunningSnippet === module.id ? 'Running...' : 'Run & See Output'}</span>
+                          <span>{isRunningSnippet === module.id ? 'Running...' : 'Run Code'}</span>
                         </button>
                       </div>
                     </div>

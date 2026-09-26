@@ -1,50 +1,121 @@
 @import "tailwindcss";
 
 @layer utilities {
-  /* OS26 Liquid Glass Utilities */
+  /* OS26 Liquid Glass Core Design System */
   .liquid-glass {
-    background: rgba(15, 23, 42, 0.45);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 1px 0 rgba(255, 255, 255, 0.1);
+    background: rgba(13, 20, 36, 0.65);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 
+      0 20px 50px -10px rgba(0, 0, 0, 0.6),
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.2),
+      inset 0 -1px 1px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  .liquid-glass-dock {
+    background: rgba(10, 16, 30, 0.78);
+    backdrop-filter: blur(32px) saturate(200%);
+    -webkit-backdrop-filter: blur(32px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 
+      0 12px 36px rgba(0, 0, 0, 0.65),
+      0 1px 3px rgba(0, 0, 0, 0.4),
+      inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.25);
   }
 
   .liquid-glass-card {
-    background: rgba(15, 23, 42, 0.55);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+    background: rgba(15, 23, 42, 0.58);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+      0 12px 30px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .liquid-glass-card-hover {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .liquid-glass-card-hover:hover {
+    background: rgba(20, 30, 55, 0.68);
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 
+      0 20px 40px -10px rgba(0, 0, 0, 0.7),
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.22);
+    transform: translateY(-2px);
   }
 
   .liquid-glass-input {
-    background: rgba(3, 7, 18, 0.6);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.4);
+    background: rgba(4, 9, 22, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: inset 0 2px 5px 0 rgba(0, 0, 0, 0.5);
   }
 
   .liquid-glass-pill {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.06);
     backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 
+      0 4px 12px rgba(0, 0, 0, 0.25),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
+  }
+
+  /* Specular shimmer highlight */
+  .liquid-specular {
+    position: relative;
+    overflow: hidden;
+  }
+  .liquid-specular::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(
+      115deg,
+      transparent 0%,
+      transparent 40%,
+      rgba(255, 255, 255, 0.08) 50%,
+      transparent 60%,
+      transparent 100%
+    );
+    pointer-events: none;
+    animation: liquid-sheen 6s infinite ease-in-out;
+  }
+
+  /* Hide scrollbar while preserving touch scrolling */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 
-/* Custom sleek scrollbar */
+@keyframes liquid-sheen {
+  0% { transform: translateX(-100%); }
+  35% { transform: translateX(100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Custom sleek scrollbar for code and body */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(0, 0, 0, 0.2);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.16);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.28);
 }

@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { AppView } from './types';
 import { Navbar } from './components/Navbar';
 import { StudyMaterials } from './components/StudyMaterials';
 import { PracticeLab } from './components/PracticeLab';
 import { TimedExam } from './components/TimedExam';
 import { InstructorDashboard } from './components/InstructorDashboard';
+import { OS26Loader } from './components/OS26Loader';
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [currentView, setCurrentView] = useState<AppView>('study');
   const [labCode, setLabCode] = useState<string | undefined>(undefined);
   const [activeTestCount, setActiveTestCount] = useState<number>(0);
@@ -47,61 +50,122 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#06080e] text-slate-100 flex flex-col font-sans selection:bg-amber-400 selection:text-slate-950 relative overflow-x-hidden">
-      {/* OS26 Liquid Glass Ambient Background Illumination */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        {/* Soft fluid glowing gradient orbs */}
-        <div className="absolute top-[-10%] left-[15%] w-[500px] h-[500px] rounded-full bg-blue-600/10 blur-[130px]" />
-        <div className="absolute top-[25%] right-[10%] w-[450px] h-[450px] rounded-full bg-amber-500/[0.07] blur-[140px]" />
-        <div className="absolute bottom-[10%] left-[20%] w-[600px] h-[600px] rounded-full bg-indigo-600/[0.08] blur-[150px]" />
-      </div>
+    <div className="min-h-screen bg-[#040711] text-slate-100 flex flex-col font-sans selection:bg-amber-400 selection:text-slate-950 relative overflow-x-hidden">
+      {/* 1. OS26 Initial Liquid Glass Loading Screen */}
+      <AnimatePresence>
+        {isLoading && (
+          <OS26Loader onComplete={() => setIsLoading(false)} />
+        )}
+      </AnimatePresence>
 
-      {/* Top Floating Glass Navigation */}
-      <div className="relative z-40">
-        <Navbar
-          currentView={currentView}
-          onViewChange={(view) => setCurrentView(view)}
-          activeTestCount={activeTestCount}
+      {/* 2. OS26 Liquid Glass Dynamic Background Physics */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        {/* Floating Orb 1: Cobalt Blue */}
+        <motion.div
+          animate={{
+            x: [0, 50, -40, 0],
+            y: [0, -45, 35, 0],
+            scale: [1, 1.2, 0.95, 1],
+            opacity: [0.18, 0.32, 0.22, 0.18]
+          }}
+          transition={{
+            duration: 16,
+            repeat: Infinity,
+            ease: 'easeInOut'
+          }}
+          className="absolute top-[-5%] left-[8%] w-[520px] h-[520px] rounded-full bg-blue-600/25 blur-[140px]"
+        />
+
+        {/* Floating Orb 2: Python Amber Gold */}
+        <motion.div
+          animate={{
+            x: [0, -45, 35, 0],
+            y: [0, 50, -30, 0],
+            scale: [1, 1.15, 0.9, 1],
+            opacity: [0.14, 0.26, 0.18, 0.14]
+          }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 1.5
+          }}
+          className="absolute top-[30%] right-[6%] w-[480px] h-[480px] rounded-full bg-amber-500/20 blur-[150px]"
+        />
+
+        {/* Floating Orb 3: Deep Indigo Glow */}
+        <motion.div
+          animate={{
+            x: [0, 35, -45, 0],
+            y: [0, -35, 45, 0],
+            scale: [0.95, 1.25, 1, 0.95],
+            opacity: [0.12, 0.24, 0.15, 0.12]
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 3
+          }}
+          className="absolute bottom-[5%] left-[22%] w-[600px] h-[600px] rounded-full bg-indigo-600/20 blur-[160px]"
         />
       </div>
 
-      {/* Main Content Area */}
-      <main className="flex-1 relative z-10 pb-16">
-        {currentView === 'study' && (
-          <StudyMaterials
-            onOpenInLab={handleOpenInLab}
-            onStartTest={() => setCurrentView('test')}
-          />
-        )}
+      {/* 3. Top Floating Glass Navigation Bar */}
+      <Navbar
+        currentView={currentView}
+        onViewChange={(view) => setCurrentView(view)}
+        activeTestCount={activeTestCount}
+      />
 
-        {currentView === 'practice' && (
-          <PracticeLab initialCode={labCode} />
-        )}
+      {/* 4. Main Content Area with OS26 View Transitions */}
+      {/* pb-28 on mobile guarantees content is never clipped by the bottom dock */}
+      <main className="flex-1 relative z-10 pb-28 md:pb-16">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentView}
+            initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, y: -14, filter: 'blur(6px)' }}
+            transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {currentView === 'study' && (
+              <StudyMaterials
+                onOpenInLab={handleOpenInLab}
+                onStartTest={() => setCurrentView('test')}
+              />
+            )}
 
-        {currentView === 'test' && (
-          <TimedExam
-            onGoToStudy={() => setCurrentView('study')}
-            onGoToLab={() => setCurrentView('practice')}
-          />
-        )}
+            {currentView === 'practice' && (
+              <PracticeLab initialCode={labCode} />
+            )}
 
-        {currentView === 'mentor' && (
-          <InstructorDashboard />
-        )}
+            {currentView === 'test' && (
+              <TimedExam
+                onGoToStudy={() => setCurrentView('study')}
+                onGoToLab={() => setCurrentView('practice')}
+              />
+            )}
+
+            {currentView === 'mentor' && (
+              <InstructorDashboard />
+            )}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
-      {/* Minimalist OS26 Footer */}
-      <footer className="relative z-10 border-t border-white/[0.06] bg-slate-950/40 backdrop-blur-xl py-6 text-center text-xs text-slate-500">
+      {/* 5. Minimalist Desktop Footer */}
+      <footer className="relative z-10 border-t border-white/[0.06] bg-slate-950/40 backdrop-blur-xl py-5 text-center text-xs text-slate-500 hidden md:block">
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center space-x-2">
             <div className="w-5 h-5 rounded-md bg-amber-400 text-slate-950 font-bold font-mono text-[10px] flex items-center justify-center">
               Py
             </div>
-            <span className="font-semibold text-slate-300 text-xs">LetLearn_Py Cohort Hub</span>
+            <span className="font-semibold text-slate-300 text-xs">LetLearn_Py Cohort</span>
           </div>
 
           <p className="text-slate-500 text-[11px]">
-            Minimalist Python Learning & Assessment • Student PIN: <code className="text-slate-400 font-mono">0000</code>
+            Minimalist Python Learning & Assessment • Student PIN: <code className="text-amber-300/80 font-mono">0000</code>
           </p>
 
           <div className="flex items-center space-x-3 text-slate-400 text-[11px]">
@@ -118,7 +182,7 @@ export default function App() {
             </button>
             <span>•</span>
             <button onClick={() => setCurrentView('mentor')} className="hover:text-amber-400 transition">
-              Mentor Portal
+              Mentor
             </button>
           </div>
         </div>

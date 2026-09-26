@@ -24,16 +24,16 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({ student,
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
       <div className="liquid-glass rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden my-8">
         {/* Modal Header */}
-        <div className="px-6 py-4 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center font-bold text-blue-300">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between">
+          <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center font-bold text-blue-300 shrink-0 text-sm">
               {student.name.charAt(0).toUpperCase()}
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center space-x-2">
-                <h3 className="text-lg font-bold text-white">{student.name}</h3>
+                <h3 className="text-base sm:text-lg font-bold text-white truncate">{student.name}</h3>
                 <span
-                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
+                  className={`text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shrink-0 ${
                     student.status === 'submitted'
                       ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40'
                       : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
@@ -42,7 +42,7 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({ student,
                   {student.status === 'submitted' ? 'Submitted' : 'Taking Test Live'}
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
+              <p className="text-[11px] sm:text-xs text-slate-400 truncate">
                 Score: <strong className="text-amber-300 font-mono">{student.score} / {student.totalPossible}</strong> ({student.percentage}%) • Answered: {answeredCount}
               </p>
             </div>
@@ -50,14 +50,14 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({ student,
 
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-white liquid-glass-pill rounded-xl transition"
+            className="p-1.5 sm:p-2 text-slate-400 hover:text-white liquid-glass-pill rounded-xl transition shrink-0 ml-2"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Modal Content Scrollable */}
-        <div className="p-6 overflow-y-auto space-y-6">
+        <div className="p-4 sm:p-6 overflow-y-auto space-y-5 sm:space-y-6">
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Improvement Areas */}

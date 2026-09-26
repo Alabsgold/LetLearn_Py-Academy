@@ -249,13 +249,13 @@ export const PracticeLab: React.FC<PracticeLabProps> = ({ initialCode }) => {
           </div>
 
           {/* Textarea Code Input */}
-          <div className="relative flex-1 min-h-[380px] p-4 bg-black/40">
+          <div className="relative flex-1 min-h-[260px] sm:min-h-[380px] p-3 sm:p-4 bg-black/40">
             <textarea
               value={code}
               onChange={(e) => setCode(e.target.value)}
               placeholder="# Write your Python code here..."
               spellCheck={false}
-              className="w-full h-full min-h-[380px] bg-transparent text-slate-100 font-mono text-sm leading-relaxed resize-none focus:outline-none focus:ring-0 selection:bg-amber-500/30"
+              className="w-full h-full min-h-[260px] sm:min-h-[380px] bg-transparent text-slate-100 font-mono text-xs sm:text-sm leading-relaxed resize-none focus:outline-none focus:ring-0 selection:bg-amber-500/30"
             />
           </div>
 
