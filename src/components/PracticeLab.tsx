@@ -8,119 +8,152 @@ interface PracticeLabProps {
 
 const PRESET_EXAMPLES = [
   {
-    name: '1. Creating & Heterogeneous Lists',
-    code: `# Creating different kinds of lists
-emptyList = []
+    name: 'Day 1: Syntax & Core Data Types',
+    code: `# Day 1: 30 Days of Python - Syntax & Types
+name = "Asabeneh"
+year = 2026
+skills = ["Python", "Flask", "Pandas", "JavaScript"]
+profile = {"creator": name, "challenge": "30 Days of Python"}
+
+print("Hello World from Python 3.12!")
+print(f"Author: {name} (Year: {year})")
+print(f"Skills ({len(skills)}): {skills}")
+print(f"Data types -> name: {type(name)}, year: {type(year)}, skills: {type(skills)}")`
+  },
+  {
+    name: 'Day 4: String Slicing & f-strings',
+    code: `# Day 4: Strings, Slicing & Formatting
+title = "30 Days of Python Challenge"
+
+# Slicing syntax [start:stop:step]
+print("First 7 chars:", title[:7])
+print("Reversed string:", title[::-1])
+
+# String methods
+words = title.split()
+print("Words list:", words)
+print("Joined with dashes:", "-".join(words))
+
+# Modern f-string formatting
+score = 98.456
+print(f"Formatted score: {score:.1f}%")`
+  },
+  {
+    name: 'Day 5: List Methods & Slicing',
+    code: `# Day 5: List Methods & Manipulation
+fruits = ['banana', 'orange', 'mango', 'lemon']
+
+# Adding elements
+fruits.append('apple')
+fruits.insert(2, 'strawberry')
+print("After append & insert:", fruits)
+
+# Negative indexing
+print("Last fruit (index -1):", fruits[-1])
+print("Middle slice:", fruits[1:4])
+
+# Sorting & Mutability
+fruits.sort()
+print("Alphabetically sorted:", fruits)`
+  },
+  {
+    name: 'Day 7: Sets & Unique Elements',
+    code: `# Day 7: Sets & Mathematical Set Operations
+frontend = {'HTML', 'CSS', 'JavaScript', 'React', 'Python'}
+backend = {'Python', 'Node', 'SQL', 'FastAPI', 'Docker'}
+
+print("Union (All Skills):", frontend | backend)
+print("Intersection (Shared):", frontend & backend)
+print("Difference (Frontend only):", frontend - backend)
+print("Symmetric Difference:", frontend ^ backend)`
+  },
+  {
+    name: 'Day 8: Dictionaries & Lookup',
+    code: `# Day 8: Dictionaries & Key-Value Mappings
+student = {
+    'name': 'Grace',
+    'track': 'Python Mastery',
+    'completed_days': 8,
+    'scores': [95, 88, 92]
+}
+
+# Safe lookup with .get()
+print("Student Name:", student['name'])
+print("Student GPA (safe fallback):", student.get('gpa', 'Not graded yet'))
+
+# Adding and modifying keys
+student['scores'].append(100)
+student['average'] = sum(student['scores']) / len(student['scores'])
+print(f"Updated Student: {student['name']} - Avg: {student['average']:.1f}%")`
+  },
+  {
+    name: 'Day 10: Loops, range() & enumerate()',
+    code: `# Day 10: Loops, range(), and enumerate()
+print("--- Counting Evens with range(0, 12, 2) ---")
+for num in range(0, 12, 2):
+    print(num, end=" ")
+print("\\n")
+
+languages = ["Python", "Rust", "Go", "TypeScript"]
+print("--- Enumerate with Index ---")
+for idx, lang in enumerate(languages, start=1):
+    print(f"  {idx}. {lang}")`
+  },
+  {
+    name: 'Day 11: Functions & *args, **kwargs',
+    code: `# Day 11: Functions & Arbitrary Arguments
+def calculate_stats(*args):
+    """Calculates count, sum, and average of arbitrary numbers."""
+    if not args:
+        return 0, 0, 0
+    total = sum(args)
+    avg = total / len(args)
+    return len(args), total, round(avg, 2)
+
+count, total, avg = calculate_stats(15, 25, 35, 45, 55, 65)
+print(f"Stats -> Count: {count}, Total: {total}, Average: {avg}")`
+  },
+  {
+    name: 'Day 13: List Comprehensions',
+    code: `# Day 13: List Comprehensions & Transformations
 numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-myList3 = [1, "string", 9.10]
-duplicates = [1, 1, 2, 2]
 
-print("Empty List:", emptyList)
-print("Numbers count:", len(numbers))
-print("Mixed List:", myList3)
-print("Duplicates allowed:", duplicates)`
+# Even squares in one line
+even_squares = [x**2 for x in numbers if x % 2 == 0]
+print("Even numbers squared:", even_squares)
+
+# Flattening a 2D matrix
+matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+flat = [val for row in matrix for val in row]
+print("Flattened Matrix:", flat)`
   },
   {
-    name: '2. Positive & Negative Indexing',
-    code: `# Indexing in Python
-fruits = ["Apple", "Banana", "Cherry", "Date"]
-
-print("First item (index 0):", fruits[0])
-print("Last item (index -1):", fruits[-1])
-print("Second to last (index -2):", fruits[-2])`
-  },
-  {
-    name: '3. Multi-Dimensional (Nested) Lists',
-    code: `# Multi-dimensional list
-myList = [1, 2, 3, [10, 20]]
-
-print("Full List:", myList)
-print("Element at index 3 (nested list):", myList[3])
-print("Accessing inner element 10 (myList[3][0]):", myList[3][0])
-print("Accessing inner element 20 (myList[3][1]):", myList[3][1])`
-  },
-  {
-    name: '4. append() vs extend() vs insert()',
-    code: `# Comparing append, extend, and insert
-listA = [1, 2]
-listA.append([3, 4])
-print("After append([3, 4]):", listA)
-print("Length of listA:", len(listA))
-
-listB = [1, 2]
-listB.extend([3, 4])
-print("After extend([3, 4]):", listB)
-print("Length of listB:", len(listB))
-
-numbers = [10, 20, 40]
-numbers.insert(2, 30)
-print("After numbers.insert(2, 30):", numbers)`
-  },
-  {
-    name: '5. Changing Items & Slicing Operator',
-    code: `# In-place modification and slicing
-myList = [10, 20, 30, 40, 50]
-
-# Change single item
-myList[0] = 99
-print("After myList[0] = 99:", myList)
-
-# Change multiple items with slicing [start:end]
-myList[1:3] = [200, 300]
-print("After myList[1:3] = [200, 300]:", myList)`
-  },
-  {
-    name: '6. pop(), remove(), del & clear()',
-    code: `# Removing items from lists
-scores = [100, 85, 90, 85, 70]
-
-# remove() deletes first occurrence by value
-scores.remove(85)
-print("After scores.remove(85):", scores)
-
-# pop() removes by index and returns the item
-popped_item = scores.pop(1)
-print("Popped item at index 1:", popped_item)
-print("After pop(1):", scores)
-
-# clear() empties the list
-scores.clear()
-print("After clear():", scores)`
-  },
-  {
-    name: '7. Parsing Input with split() & Loop',
-    code: `# Simulating user input string parsing
-raw_input = "5 10 15 20 25"
-
-# split() produces a list of substrings
-str_tokens = raw_input.split()
-print("Split string tokens:", str_tokens)
-
-# Loop and typecast each substring to integer
-int_list = []
-for tok in str_tokens:
-    int_list.append(int(tok))
-
-print("Final Integer List:", int_list)
-print("Total sum:", sum(int_list))`
-  },
-  {
-    name: '8. List Comprehension Power',
-    code: `# List Comprehensions: [expression for var in iterable if condition]
+    name: 'Day 14: Higher Order Functions (Map, Filter)',
+    code: `# Day 14: Functional Programming (map, filter)
 numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-# Squares of all numbers
-squares = [x**2 for x in numbers]
-print("All Squares:", squares)
+# map(): Triple all numbers
+tripled = list(map(lambda x: x * 3, numbers))
+print("Tripled with map:", tripled)
 
-# Squares of ONLY even numbers
-evens_squared = [x**2 for x in numbers if x % 2 == 0]
-print("Evens Squared:", evens_squared)
+# filter(): Numbers divisible by 3
+div_by_3 = list(filter(lambda x: x % 3 == 0, numbers))
+print("Divisible by 3 with filter:", div_by_3)`
+  },
+  {
+    name: 'Day 21: Classes & Object-Oriented Programming',
+    code: `# Day 21: Classes, Inheritance & OOP
+class Developer:
+    def __init__(self, name, language, experience_years):
+        self.name = name
+        self.language = language
+        self.experience_years = experience_years
 
-# Parse input string in one line!
-line = "100 200 500"
-parsed = [int(x) for x in line.split()]
-print("One-liner input parsed:", parsed)`
+    def introduce(self):
+        return f"{self.name} writes {self.language} with {self.experience_years} years experience."
+
+dev = Developer("Tunde", "Python 3.12", 3)
+print(dev.introduce())`
   }
 ];
 

@@ -3,15 +3,24 @@ export type AppView = 'study' | 'practice' | 'test' | 'student' | 'mentor';
 export interface StudyModule {
   id: string;
   sectionId: string;
+  dayNumber?: number; // Day 1 to 30
+  track?: string; // 'Foundations' | 'Data Structures' | 'Control Flow & Functions' | 'Advanced & I/O' | 'OOP, Data & Web'
   title: string;
   category: string;
   summary: string;
+  estimatedTime?: string;
   beginnerNote?: string;
   keyPoints: string[];
   codeExample: string;
   testGotcha?: string;
+  exercises?: {
+    level1: string[];
+    level2?: string[];
+    level3?: string[];
+  };
+  exerciseStarterCode?: string;
   diagram?: {
-    type: 'indexing' | 'mutability' | 'multid' | 'comprehension' | 'flow';
+    type: 'indexing' | 'mutability' | 'multid' | 'comprehension' | 'flow' | 'oop' | 'regex';
     data: any;
   };
   quickQuiz?: {

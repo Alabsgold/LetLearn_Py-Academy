@@ -43,29 +43,29 @@ export const ProgressRing: React.FC<ProgressRingProps> = ({
   const getReadinessStatus = () => {
     if (percentage === 100) {
       return {
-        label: '100% Assessment Ready',
+        label: '100% Curriculum Mastered',
         color: 'text-emerald-400 bg-emerald-500/15 border-emerald-500/30',
-        note: "Exceptional work! You have reviewed all 12 modules. Ready for today's test."
+        note: `Exceptional work! You have mastered all ${totalCount} days of Python. Ready for assessment certification.`
       };
     }
     if (percentage >= 70) {
       return {
         label: 'High Test Readiness',
         color: 'text-blue-400 bg-blue-500/15 border-blue-500/30',
-        note: 'Great mastery! A few advanced topics remaining before your timed test.'
+        note: 'Great mastery! Reaching advanced OOP, data analysis, and web development topics.'
       };
     }
     if (percentage >= 30) {
       return {
         label: 'Progressing Steadily',
         color: 'text-amber-400 bg-amber-500/15 border-amber-500/30',
-        note: 'Building core foundation on lists, indexing, and methods.'
+        note: 'Building strong foundations across Python data structures, functions, and control flow.'
       };
     }
     return {
-      label: 'Cohort Kickoff',
+      label: 'Learning Path Kickoff',
       color: 'text-slate-300 bg-white/10 border-white/15',
-      note: 'Mark modules as reviewed as you read and practice code snippets.'
+      note: 'Mark days as completed as you study tutorials and solve daily exercises.'
     };
   };
 
